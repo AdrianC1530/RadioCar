@@ -26,7 +26,8 @@ más se usa en el carro: **videos desde la memoria USB** y **música del teléfo
 
 ## Instalar rápido
 
-1. Copia [`dist/RadioCar-0.3.0.apk`](dist/) a un pendrive.
+1. Descarga el APK desde [**Releases**](https://github.com/AdrianC1530/RadioCar/releases/latest)
+   y cópialo a un pendrive.
 2. En la radio: administrador de archivos → toca el APK → instalar.
 3. Pulsa **Inicio** → elige **RadioCar** → **Siempre**.
 4. Acepta los permisos (ubicación y archivos).
