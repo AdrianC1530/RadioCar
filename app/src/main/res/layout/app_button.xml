@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Botón grande con ícono + texto (YouTube, YT Music, Música BT, Teléfono) -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="0dp"
+    android:layout_height="match_parent"
+    android:layout_weight="1"
+    android:background="@drawable/bg_button_surface"
+    android:clickable="true"
+    android:focusable="true"
+    android:gravity="center"
+    android:orientation="horizontal"
+    android:paddingStart="@dimen/app_btn_pad"
+    android:paddingEnd="@dimen/app_btn_pad">
+
+    <ImageView
+        android:id="@+id/btn_icon"
+        android:layout_width="@dimen/app_btn_icon"
+        android:layout_height="@dimen/app_btn_icon"
+        android:importantForAccessibility="no"
+        android:scaleType="fitCenter" />
+
+    <TextView
+        android:id="@+id/btn_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/app_btn_label_gap"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif-medium"
+        android:singleLine="true"
+        android:textColor="@color/text_primary"
+        android:textSize="@dimen/app_btn_text" />
+</LinearLayout>

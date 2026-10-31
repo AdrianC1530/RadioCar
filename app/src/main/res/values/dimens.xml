@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Pantallas bajas (p. ej. 1024x600 con densidad 240 ≈ 683x400dp) -->
+    <dimen name="screen_pad">10dp</dimen>
+    <dimen name="gap">10dp</dimen>
+    <dimen name="rail_width">60dp</dimen>
+    <dimen name="rail_btn">46dp</dimen>
+    <dimen name="card_pad">12dp</dimen>
+    <dimen name="card_radius">20dp</dimen>
+
+    <dimen name="top_clock_size">36sp</dimen>
+    <dimen name="greeting_size">15sp</dimen>
+    <dimen name="date_size">12sp</dimen>
+    <dimen name="speed_size">18sp</dimen>
+
+    <dimen name="card_title_size">16sp</dimen>
+    <dimen name="card_sub_size">12sp</dimen>
+    <dimen name="card_icon">34dp</dimen>
+    <dimen name="card_icon_pad">7dp</dimen>
+    <dimen name="status_size">14sp</dimen>
+
+    <dimen name="app_btn_height">50dp</dimen>
+    <dimen name="app_btn_icon">24dp</dimen>
+    <dimen name="app_btn_text">13sp</dimen>
+    <dimen name="app_btn_pad">8dp</dimen>
+    <dimen name="app_btn_label_gap">6dp</dimen>
+    <dimen name="chip_height">34dp</dimen>
+    <dimen name="chip_text">13sp</dimen>
+
+    <dimen name="now_art">50dp</dimen>
+    <dimen name="now_title_size">16sp</dimen>
+    <dimen name="media_gap">6dp</dimen>
+    <dimen name="ctrl_btn">40dp</dimen>
+    <dimen name="play_btn">46dp</dimen>
+
+    <dimen name="app_cell">96dp</dimen>
+    <dimen name="app_icon">48dp</dimen>
+</resources>

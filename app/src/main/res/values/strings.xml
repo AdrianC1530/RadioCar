@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">RadioCar</string>
+    <string name="media_listener_label">RadioCar · control de música</string>
+    <string name="truck_badge">F-150</string>
+
+    <string name="greeting_morning">Buenos días</string>
+    <string name="greeting_afternoon">Buenas tardes</string>
+    <string name="greeting_night">Buenas noches</string>
+
+    <string name="kmh">km/h</string>
+    <string name="gps_enable">GPS</string>
+
+    <!-- Videos -->
+    <string name="video_title">Videos de música</string>
+    <string name="video_sub_app">%1$s · mantén pulsado para cambiar</string>
+    <string name="video_sub_missing">Instala YouTube o NewPipe</string>
+    <string name="chip_search">Buscar</string>
+    <string name="chip_add">Agregar</string>
+    <string name="search_hint">Artista, canción o playlist</string>
+    <string name="search_go">Buscar</string>
+    <string name="search_save">Guardar atajo</string>
+    <string name="search_cancel">Cancelar</string>
+    <string name="search_remove_title">¿Quitar el atajo «%1$s»?</string>
+    <string name="search_remove">Quitar</string>
+    <string name="search_add_title">Nuevo atajo de búsqueda</string>
+    <string name="search_dialog_title">Buscar videos</string>
+    <string name="search_failed">No hay app de videos para buscar</string>
+
+    <!-- Bluetooth -->
+    <string name="bt_title">Bluetooth</string>
+    <string name="bt_subtitle">Música del teléfono</string>
+    <string name="bt_music">Música BT</string>
+    <string name="bt_playing">Sonando: %1$s</string>
+    <string name="bt_connected">Conectado · %1$s</string>
+    <string name="bt_disconnected">Sin teléfono conectado</string>
+    <string name="bt_off">Bluetooth apagado</string>
+    <string name="bt_hint">Conecta tu teléfono y dale play</string>
+
+    <!-- Reproduciendo ahora -->
+    <string name="media_label">REPRODUCIENDO</string>
+    <string name="media_no_access_title">Activa el control de música</string>
+    <string name="media_no_access_sub">Toca aquí para dar el permiso</string>
+    <string name="media_idle_title">Nada sonando</string>
+    <string name="media_idle_sub">Pon un video o la música BT</string>
+    <string name="media_listener_hidden">Tu radio oculta este ajuste. Actívalo por ADB (ver README).</string>
+
+    <!-- Accesos -->
+    <string name="slot_nav">Navegación</string>
+    <string name="slot_radio">Radio</string>
+    <string name="slot_video">Videos</string>
+    <string name="slot_music">YT Music</string>
+    <string name="slot_bt_music">Música BT</string>
+    <string name="slot_phone">Teléfono</string>
+    <string name="slot_settings">Ajustes</string>
+    <string name="pick_app_title">App para %1$s</string>
+    <string name="launch_failed">No se pudo abrir la app</string>
+    <string name="apps_loading">Cargando apps…</string>
+
+    <string name="drawer_title">Aplicaciones</string>
+    <string name="cd_home">Inicio</string>
+    <string name="cd_apps">Todas las apps</string>
+    <string name="cd_close">Cerrar</string>
+    <string name="cd_prev">Anterior</string>
+    <string name="cd_play">Reproducir o pausar</string>
+    <string name="cd_next">Siguiente</string>
+    <string name="cd_art">Carátula</string>
+</resources>

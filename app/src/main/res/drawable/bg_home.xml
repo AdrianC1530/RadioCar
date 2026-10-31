@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Fondo: negro verdoso con dos resplandores (verde arriba a la izquierda, violeta abajo a la derecha) -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item><color android:color="@color/bg" /></item>
+    <item>
+        <shape android:shape="rectangle">
+            <gradient android:type="radial" android:centerX="0.12" android:centerY="0.05"
+                android:gradientRadius="560dp" android:startColor="@color/glow_green" android:endColor="#00000000" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <gradient android:type="radial" android:centerX="0.95" android:centerY="1.0"
+                android:gradientRadius="520dp" android:startColor="@color/glow_violet" android:endColor="#00000000" />
+        </shape>
+    </item>
+</layer-list>

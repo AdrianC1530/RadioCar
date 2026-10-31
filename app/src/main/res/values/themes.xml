@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.RadioCar" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/bg</item>
+        <item name="android:colorPrimary">@color/bg</item>
+        <item name="android:colorPrimaryDark">@color/bg</item>
+        <item name="android:colorAccent">@color/accent_1</item>
+        <item name="android:statusBarColor">@color/bg</item>
+        <item name="android:navigationBarColor">@color/bg</item>
+        <item name="android:windowShowWallpaper">false</item>
+        <item name="android:windowDisablePreview">true</item>
+    </style>
+
+    <style name="RailButton">
+        <item name="android:layout_width">@dimen/rail_btn</item>
+        <item name="android:layout_height">@dimen/rail_btn</item>
+        <item name="android:padding">13dp</item>
+        <item name="android:scaleType">fitCenter</item>
+        <item name="android:background">@drawable/bg_round_ripple</item>
+        <item name="android:tint">@color/text_secondary</item>
+    </style>
+
+    <style name="CtrlButton">
+        <item name="android:layout_width">@dimen/ctrl_btn</item>
+        <item name="android:layout_height">@dimen/ctrl_btn</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:scaleType">fitCenter</item>
+        <item name="android:background">@drawable/bg_round_ripple</item>
+        <item name="android:tint">@color/text_primary</item>
+    </style>
+</resources>
