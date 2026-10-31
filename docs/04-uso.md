@@ -54,8 +54,6 @@ Toca la insignia **F-150** (arriba a la derecha) o **mantén pulsado** un espaci
 
 Tip: una foto **horizontal** de la F-150 queda muy bien.
 
-![Foto de fondo](img/fondo-foto.png)
-
 ## Barra lateral
 
 Inicio · Navegación · Radio FM · Teléfono · Todas las apps · Ajustes.
