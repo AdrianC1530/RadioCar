@@ -5,6 +5,10 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
+    <!-- Leer los videos de la memoria USB -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+
     <!-- Estado del Bluetooth (qué teléfono está conectado) -->
     <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
@@ -50,7 +54,7 @@
             </intent-filter>
         </activity>
 
-        <!-- Necesario para leer y controlar lo que está sonando (Spotify, YouTube Music, BT…) -->
+        <!-- Necesario para leer y controlar lo que está sonando (reproductor de video, música BT…) -->
         <service
             android:name=".MediaListenerService"
             android:exported="true"

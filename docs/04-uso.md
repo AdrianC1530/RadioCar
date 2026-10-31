@@ -1,28 +1,23 @@
 # 04 · Uso
 
-![Inicio](img/inicio-v0.2.png)
+![Inicio](img/inicio-v0.3.png)
 
-## Videos de música
+## Videos (memoria USB)
 
-- **YouTube / YT Music**: abren la app. Muestran el ícono real de la app elegida.
-- **Buscar**: escribe artista, canción o playlist y abre YouTube con los resultados.
-  Con *Guardar atajo* queda como botón fijo.
-- **Atajos** ("Música para manejar", etc.): un toque y busca eso en YouTube.
-  - **+ Agregar** crea un atajo nuevo.
-  - **Mantén pulsado** un atajo para quitarlo.
-- **Mantén pulsado** el botón de YouTube o YT Music para usar otra app (NewPipe, Spotify…).
+1. Mete la memoria USB con los videos en la radio.
+2. La tarjeta **Videos** muestra el nombre de la memoria y cuántos videos tiene
+   (p. ej. *USB · 23 videos*). Si no hay USB: *Inserta tu memoria USB*.
+3. Opciones:
+   - **Reproductor** — abre el reproductor de video de la radio.
+   - **Archivos** — abre el explorador para navegar las carpetas de la USB.
+   - **Accesos a videos** (abajo, desliza a los lados) — los más recientes de la USB;
+     un toque y se reproduce directamente en el reproductor de fábrica.
+4. **Mantén pulsado** *Reproductor* o *Archivos* para usar otra app (VLC, MX Player…).
 
-![Búsqueda](img/busqueda-youtube.png)
-
-### Consejo: YouTube se pausa al salir
-
-YouTube gratis **detiene el video** si vuelves a la pantalla de inicio (la reproducción en segundo
-plano es de YouTube Premium). Alternativas:
-
-- **[NewPipe](https://newpipe.net/)** (gratis, código abierto): reproduce en segundo plano,
-  sin anuncios y es **más liviano** que YouTube — ideal para 1 GB de RAM. RadioCar lo detecta solo.
-  Se instala desde su web o F-Droid (no está en Play Store).
-- Dejar el video en pantalla completa mientras suena.
+Notas:
+- La primera vez pide permiso para **leer archivos**. Si lo negaste, toca *Permitir acceso a la USB*.
+- Al meter la USB, la lista se actualiza sola (la radio tarda unos segundos en indexarla).
+- Se buscan: mp4, mkv, avi, mov, 3gp, ts, flv, wmv, m4v, mpg, vob, rmvb.
 
 ## Bluetooth (música del teléfono)
 
@@ -40,11 +35,26 @@ Los controles de la barra "Reproduciendo ahora" también funcionan con la músic
 
 ## Reproduciendo ahora
 
-![Reproduciendo](img/reproduciendo-v0.2.png)
-
 - Toca la barra para abrir la app que está sonando.
 - Anterior / play-pausa / siguiente.
-- El brillo de la barra toma el color de la carátula o miniatura.
+- El brillo de la barra toma el color de la carátula.
+
+## Fondo de pantalla
+
+Toca la insignia **F-150** (arriba a la derecha) o **mantén pulsado** un espacio vacío del fondo.
+
+![Selector de fondo](img/selector-fondo.png)
+
+| Fondo | Descripción |
+|---|---|
+| **Horizonte camaleón** | Por defecto. Luz verde → turquesa → violeta a lo ancho, como un atardecer reflejado en la pintura |
+| **Aurora** | Resplandores verde y violeta en las esquinas |
+| **Negro** | Negro puro, lo menos distractor de noche |
+| **Foto propia** | Elige una foto (de la USB o de la radio). Se recorta a la pantalla horizontal, se oscurece para que se lean los textos y se guarda en la radio, así sigue aunque saques la USB |
+
+Tip: una foto **horizontal** de la F-150 queda muy bien.
+
+![Foto de fondo](img/fondo-foto.png)
 
 ## Barra lateral
 

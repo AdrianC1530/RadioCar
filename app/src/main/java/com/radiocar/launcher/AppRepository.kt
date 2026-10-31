@@ -49,18 +49,18 @@ class AppRepository(private val context: Context) {
         VIDEO(
             "video", R.string.slot_video, R.drawable.ic_video,
             listOf(
-                "com.google.android.youtube", "app.revanced.android.youtube", "org.schabi.newpipe",
-                "com.liskovsoft.smarttubetv.beta", "com.teamsmart.videomanager.tv",
+                "com.tw.video", "com.tw.videoplayer", "com.tw.media.video", "com.syu.video",
+                "org.videolan.vlc", "com.mxtech.videoplayer.ad", "com.mxtech.videoplayer.pro",
             ),
-            listOf("youtube", "newpipe", "smarttube", "video"),
+            listOf("video", "vídeo", "视频", "reproductor", "movie", "película"),
         ),
-        MUSIC(
-            "music", R.string.slot_music, R.drawable.ic_music_note,
+        FILES(
+            "files", R.string.slot_files, R.drawable.ic_folder,
             listOf(
-                "com.google.android.apps.youtube.music", "app.revanced.android.apps.youtube.music",
-                "com.spotify.music", "deezer.android.app", "com.apple.android.music", "com.tw.music",
+                "com.tw.filemanager", "com.tw.file", "com.android.documentsui",
+                "com.google.android.documentsui", "com.mixplorer", "com.ghisler.android.TotalCommander",
             ),
-            listOf("yt music", "youtube music", "spotify", "music", "música"),
+            listOf("archivos", "explorador", "gestor", "file", "files"),
         ),
         BT_MUSIC(
             "bt_music", R.string.slot_bt_music, R.drawable.ic_bluetooth,

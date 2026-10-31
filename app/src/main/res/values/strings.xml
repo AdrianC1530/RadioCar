@@ -11,21 +11,18 @@
     <string name="kmh">km/h</string>
     <string name="gps_enable">GPS</string>
 
-    <!-- Videos -->
-    <string name="video_title">Videos de música</string>
-    <string name="video_sub_app">%1$s · mantén pulsado para cambiar</string>
-    <string name="video_sub_missing">Instala YouTube o NewPipe</string>
-    <string name="chip_search">Buscar</string>
-    <string name="chip_add">Agregar</string>
-    <string name="search_hint">Artista, canción o playlist</string>
-    <string name="search_go">Buscar</string>
-    <string name="search_save">Guardar atajo</string>
-    <string name="search_cancel">Cancelar</string>
-    <string name="search_remove_title">¿Quitar el atajo «%1$s»?</string>
-    <string name="search_remove">Quitar</string>
-    <string name="search_add_title">Nuevo atajo de búsqueda</string>
-    <string name="search_dialog_title">Buscar videos</string>
-    <string name="search_failed">No hay app de videos para buscar</string>
+    <!-- Videos (memoria USB) -->
+    <string name="video_title">Videos</string>
+    <string name="video_player">Reproductor</string>
+    <string name="video_files">Archivos</string>
+    <string name="video_usb">%1$s · %2$d videos</string>
+    <string name="video_usb_empty">%1$s · sin videos</string>
+    <string name="video_internal">Sin USB · %1$d videos en la radio</string>
+    <string name="video_no_usb">Inserta tu memoria USB</string>
+    <string name="video_no_permission">Permite leer la memoria USB</string>
+    <string name="video_allow">Permitir acceso a la USB</string>
+    <string name="video_loading">Buscando videos…</string>
+    <string name="video_play_failed">No se pudo abrir el video</string>
 
     <!-- Bluetooth -->
     <string name="bt_title">Bluetooth</string>
@@ -42,14 +39,23 @@
     <string name="media_no_access_title">Activa el control de música</string>
     <string name="media_no_access_sub">Toca aquí para dar el permiso</string>
     <string name="media_idle_title">Nada sonando</string>
-    <string name="media_idle_sub">Pon un video o la música BT</string>
-    <string name="media_listener_hidden">Tu radio oculta este ajuste. Actívalo por ADB (ver README).</string>
+    <string name="media_idle_sub">Pon un video de la USB o la música BT</string>
+    <string name="media_listener_hidden">Tu radio oculta este ajuste. Actívalo por ADB (ver docs).</string>
+
+    <!-- Fondo -->
+    <string name="bg_title">Fondo de pantalla</string>
+    <string name="bg_horizon">Horizonte camaleón</string>
+    <string name="bg_aurora">Aurora</string>
+    <string name="bg_black">Negro</string>
+    <string name="bg_photo">Foto propia (de la USB o la radio)…</string>
+    <string name="bg_photo_failed">No se pudo usar esa foto</string>
+    <string name="bg_no_picker">Tu radio no tiene selector de fotos</string>
 
     <!-- Accesos -->
     <string name="slot_nav">Navegación</string>
     <string name="slot_radio">Radio</string>
-    <string name="slot_video">Videos</string>
-    <string name="slot_music">YT Music</string>
+    <string name="slot_video">Reproductor de video</string>
+    <string name="slot_files">Archivos</string>
     <string name="slot_bt_music">Música BT</string>
     <string name="slot_phone">Teléfono</string>
     <string name="slot_settings">Ajustes</string>

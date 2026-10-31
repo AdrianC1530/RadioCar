@@ -15,7 +15,7 @@ import android.os.SystemClock
 import android.view.KeyEvent
 
 /**
- * Lee lo que está sonando en cualquier app (Spotify, YouTube Music, música BT de la radio…)
+ * Lee lo que está sonando en cualquier app (reproductor de video, música BT de la radio…)
  * y la controla. Requiere que el usuario habilite el acceso a notificaciones de RadioCar.
  */
 class MediaHub(

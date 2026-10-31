@@ -35,6 +35,9 @@ $adb = "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe"
 | Resolución / densidad | _pendiente_ |
 | Paquete Radio FM | _pendiente_ (se prueba `com.tw.radio`) |
 | Paquete Bluetooth / Música BT | _pendiente_ (se prueba `com.tw.bt`, `com.tw.btmusic`) |
+| Paquete del reproductor de video | _pendiente_ (se prueba `com.tw.video`) |
+| Ruta de la memoria USB | _pendiente_ (`adb shell ls /storage`) |
+| ¿El reproductor de fábrica abre videos desde RadioCar? | _pendiente_ |
 | ¿El BT usa la pila de Android o un chip aparte? | _pendiente_ |
 | ¿La app BT publica lo que suena (MediaSession)? | _pendiente_ |
 | RAM usada por RadioCar | _pendiente_ |

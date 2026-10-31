@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Botón grande con ícono + texto (YouTube, YT Music, Música BT, Teléfono) -->
+<!-- Botón grande con ícono + texto (Reproductor, Archivos, Música BT, Teléfono) -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="0dp"
     android:layout_height="match_parent"

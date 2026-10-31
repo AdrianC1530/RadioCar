@@ -20,14 +20,12 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.StrictMode
 import android.provider.Settings
-import android.text.InputType
+import android.text.TextUtils
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
-import android.view.inputmethod.EditorInfo
-import android.widget.EditText
-import android.widget.FrameLayout
 import android.widget.GridView
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -45,13 +43,15 @@ class MainActivity : Activity() {
     private lateinit var media: MediaHub
     private lateinit var speed: SpeedTracker
     private lateinit var bt: BtStatus
-    private lateinit var searches: VideoSearches
+    private lateinit var videos: UsbVideos
+    private lateinit var backgrounds: Backgrounds
     private val handler = Handler(Looper.getMainLooper())
 
+    private lateinit var root: View
     private lateinit var greeting: TextView
     private lateinit var speedValue: TextView
     private lateinit var speedUnit: TextView
-    private lateinit var videoSub: TextView
+    private lateinit var videoStatus: TextView
     private lateinit var videoChips: LinearLayout
     private lateinit var btDot: View
     private lateinit var btStatusText: TextView
@@ -65,14 +65,12 @@ class MainActivity : Activity() {
     private lateinit var drawer: View
     private lateinit var gridAdapter: AppGridAdapter
 
-    /** Botones que muestran el ícono real de la app asignada (YouTube, YT Music). */
-    private val appButtons = LinkedHashMap<Slot, View>()
-
     private var mediaState: MediaHub.State? = null
     private var btState: BtStatus.State = BtStatus.State.Unknown
     private var glowColor = 0
     private var greetingRes = 0
     private var ticks = 0
+    @Volatile private var scanning = false
 
     /** Un "tic" por segundo mientras la pantalla está visible. */
     private val ticker = object : Runnable {
@@ -92,17 +90,32 @@ class MainActivity : Activity() {
         override fun onReceive(context: Context, intent: Intent) = refreshBt()
     }
 
+    /** USB conectada / retirada / terminó de indexarse. */
+    private val usbReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            // Al montar, el índice tarda unos segundos: refrescamos ahora y otra vez luego.
+            refreshVideos()
+            handler.postDelayed({ refreshVideos() }, 4000L)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (Build.VERSION.SDK_INT < 29) {
+            // Permite pasar rutas file:// al reproductor de fábrica (es lo que mejor entienden).
+            StrictMode.setVmPolicy(StrictMode.VmPolicy.Builder().build())
+        }
         setContentView(R.layout.activity_main)
 
         apps = AppRepository(this)
         media = MediaHub(this, ::renderMedia)
         speed = SpeedTracker(this, ::renderSpeed)
         bt = BtStatus(this)
-        searches = VideoSearches(this)
+        videos = UsbVideos(this)
+        backgrounds = Backgrounds(this)
 
         bindViews()
+        applyBackground()
         reloadApps()
 
         registerSystemReceiver(packageReceiver, IntentFilter().apply {
@@ -116,14 +129,23 @@ class MainActivity : Activity() {
             addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED)
             addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
         })
+        registerSystemReceiver(usbReceiver, IntentFilter().apply {
+            addAction(Intent.ACTION_MEDIA_MOUNTED)
+            addAction(Intent.ACTION_MEDIA_UNMOUNTED)
+            addAction(Intent.ACTION_MEDIA_REMOVED)
+            addAction(Intent.ACTION_MEDIA_EJECT)
+            addAction(Intent.ACTION_MEDIA_SCANNER_FINISHED)
+            addDataScheme("file")
+        })
 
-        if (!speed.hasPermission()) requestLocation()
+        requestMissingPermissions()
     }
 
     override fun onResume() {
         super.onResume()
         media.start()
         speed.start()
+        refreshVideos()
         handler.post(ticker)
     }
 
@@ -137,6 +159,7 @@ class MainActivity : Activity() {
     override fun onDestroy() {
         unregisterReceiver(packageReceiver)
         unregisterReceiver(btReceiver)
+        unregisterReceiver(usbReceiver)
         super.onDestroy()
     }
 
@@ -153,16 +176,39 @@ class MainActivity : Activity() {
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == REQ_LOCATION) speed.start()
+        if (requestCode == REQ_PERMISSIONS) {
+            speed.start()
+            refreshVideos()
+        }
+    }
+
+    @Deprecated("Sin AndroidX usamos la API clásica")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        val uri = data?.data
+        if (requestCode == REQ_PHOTO && resultCode == RESULT_OK && uri != null) {
+            Thread {
+                val ok = backgrounds.importPhoto(uri)
+                handler.post {
+                    if (ok) {
+                        backgrounds.style = Backgrounds.Style.PHOTO
+                        applyBackground()
+                    } else {
+                        Toast.makeText(this, R.string.bg_photo_failed, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }.start()
+        }
     }
 
     // ================================================================ vistas
 
     private fun bindViews() {
+        root = findViewById(R.id.root)
         greeting = findViewById(R.id.greeting)
         speedValue = findViewById(R.id.speed_value)
         speedUnit = findViewById(R.id.speed_unit)
-        videoSub = findViewById(R.id.video_sub)
+        videoStatus = findViewById(R.id.video_sub)
         videoChips = findViewById(R.id.video_chips)
         btDot = findViewById(R.id.bt_dot)
         btStatusText = findViewById(R.id.bt_status)
@@ -176,7 +222,7 @@ class MainActivity : Activity() {
         drawer = findViewById(R.id.drawer)
 
         // Respeta las barras del sistema (la radio puede tener barra de estado/navegación propia).
-        findViewById<View>(R.id.root).setOnApplyWindowInsetsListener { v, insets ->
+        root.setOnApplyWindowInsetsListener { v, insets ->
             @Suppress("DEPRECATION")
             v.setPadding(
                 insets.systemWindowInsetLeft, insets.systemWindowInsetTop,
@@ -192,17 +238,21 @@ class MainActivity : Activity() {
         updateGreeting()
 
         findViewById<View>(R.id.speed_chip).setOnClickListener {
-            if (!speed.hasPermission()) requestLocation()
+            if (!speed.hasPermission()) requestMissingPermissions()
         }
+        // Personalizar el fondo: tocar la insignia F-150 o mantener pulsado el fondo.
+        findViewById<View>(R.id.badge).setOnClickListener { showBackgroundPicker() }
+        root.setOnLongClickListener { showBackgroundPicker(); true }
 
-        // Videos
-        setupAppButton(R.id.btn_video, Slot.VIDEO)
-        setupAppButton(R.id.btn_video_music, Slot.MUSIC)
-        renderChips()
+        // Videos (USB)
+        setupActionButton(R.id.btn_video, Slot.VIDEO, R.drawable.ic_play, R.string.video_player, accent = true)
+        setupActionButton(R.id.btn_files, Slot.FILES, R.drawable.ic_folder, R.string.video_files, accent = false)
+        findViewById<View>(R.id.video_card).setOnClickListener { launchSlot(Slot.VIDEO) }
+        videoStatus.setText(R.string.video_loading)
 
         // Bluetooth
-        setupFixedButton(R.id.btn_bt_music, Slot.BT_MUSIC, R.drawable.ic_music_note, R.string.bt_music, accent = true)
-        setupFixedButton(R.id.btn_bt_phone, Slot.PHONE, R.drawable.ic_phone, R.string.slot_phone, accent = false)
+        setupActionButton(R.id.btn_bt_music, Slot.BT_MUSIC, R.drawable.ic_music_note, R.string.bt_music, accent = true)
+        setupActionButton(R.id.btn_bt_phone, Slot.PHONE, R.drawable.ic_phone, R.string.slot_phone, accent = false)
         findViewById<View>(R.id.bt_card).setOnClickListener { launchSlot(Slot.BT_MUSIC) }
 
         // Reproduciendo ahora
@@ -235,15 +285,8 @@ class MainActivity : Activity() {
         findViewById<View>(R.id.drawer_close).setOnClickListener { closeDrawer() }
     }
 
-    private fun setupAppButton(id: Int, slot: Slot) {
-        val button = findViewById<View>(id)
-        button.findViewById<TextView>(R.id.btn_label).setText(slot.title)
-        button.setOnClickListener { launchSlot(slot) }
-        button.setOnLongClickListener { pickApp(slot); true }
-        appButtons[slot] = button
-    }
-
-    private fun setupFixedButton(id: Int, slot: Slot, icon: Int, label: Int, accent: Boolean) {
+    /** Botón grande ícono + texto. Mantener pulsado = elegir otra app. */
+    private fun setupActionButton(id: Int, slot: Slot, icon: Int, label: Int, accent: Boolean) {
         val button = findViewById<View>(id)
         val fg = getColor(if (accent) R.color.on_accent else R.color.text_primary)
         button.findViewById<ImageView>(R.id.btn_icon).apply {
@@ -265,28 +308,6 @@ class MainActivity : Activity() {
         findViewById<View>(id).apply {
             setOnClickListener { launchSlot(slot) }
             setOnLongClickListener { pickApp(slot); true }
-        }
-    }
-
-    /** Pone el ícono y nombre reales de la app asignada a cada botón. */
-    private fun refreshAppButtons() {
-        for ((slot, button) in appButtons) {
-            val entry = apps.resolve(slot)
-            val icon = button.findViewById<ImageView>(R.id.btn_icon)
-            if (entry != null) {
-                icon.imageTintList = null
-                icon.setImageDrawable(entry.icon)
-            } else {
-                icon.setImageResource(slot.icon)
-                icon.imageTintList = ColorStateList.valueOf(getColor(R.color.text_secondary))
-            }
-            button.findViewById<TextView>(R.id.btn_label).text = entry?.label ?: getString(slot.title)
-        }
-        val video = apps.resolve(Slot.VIDEO)
-        videoSub.text = if (video != null) {
-            getString(R.string.video_sub_app, video.label)
-        } else {
-            getString(R.string.video_sub_missing)
         }
     }
 
@@ -316,26 +337,101 @@ class MainActivity : Activity() {
         }
     }
 
-    // ================================================================ videos
+    // ================================================================ fondo
 
-    private fun renderChips() {
-        videoChips.removeAllViews()
-        videoChips.addView(makeChip(getString(R.string.chip_search), R.drawable.ic_search, highlight = true) {
-            promptSearch()
-        })
-        for (query in searches.list()) {
-            videoChips.addView(
-                makeChip(query, null, onLongClick = { confirmRemoveSearch(query) }) { searchVideos(query) },
-            )
+    private fun applyBackground() {
+        if (backgrounds.style == Backgrounds.Style.PHOTO) {
+            Thread {
+                val d = backgrounds.build()
+                handler.post { root.background = d }
+            }.start()
+        } else {
+            root.background = backgrounds.build()
         }
-        videoChips.addView(makeChip(getString(R.string.chip_add), R.drawable.ic_add) { promptAddSearch() })
+    }
+
+    private fun showBackgroundPicker() {
+        val styles = Backgrounds.Style.entries
+        AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
+            .setTitle(R.string.bg_title)
+            .setSingleChoiceItems(
+                styles.map { getString(it.title) }.toTypedArray(),
+                styles.indexOf(backgrounds.style),
+            ) { dialog, which ->
+                dialog.dismiss()
+                val chosen = styles[which]
+                if (chosen == Backgrounds.Style.PHOTO) {
+                    pickPhoto()
+                } else {
+                    backgrounds.style = chosen
+                    applyBackground()
+                }
+            }
+            .show()
+    }
+
+    private fun pickPhoto() {
+        val intent = Intent(Intent.ACTION_GET_CONTENT).setType("image/*").addCategory(Intent.CATEGORY_OPENABLE)
+        try {
+            @Suppress("DEPRECATION")
+            startActivityForResult(intent, REQ_PHOTO)
+        } catch (e: ActivityNotFoundException) {
+            Toast.makeText(this, R.string.bg_no_picker, Toast.LENGTH_LONG).show()
+        }
+    }
+
+    // ================================================================ videos USB
+
+    private fun refreshVideos() {
+        if (scanning) return
+        scanning = true
+        Thread {
+            val result = videos.scan()
+            handler.post {
+                scanning = false
+                renderVideos(result)
+            }
+        }.apply { name = "scan-usb" }.start()
+    }
+
+    private fun renderVideos(scan: UsbVideos.Scan) {
+        videoStatus.text = when {
+            !scan.hasPermission -> getString(R.string.video_no_permission)
+            scan.usbMounted && scan.total > 0 -> getString(R.string.video_usb, scan.usbLabel, scan.total)
+            scan.usbMounted -> getString(R.string.video_usb_empty, scan.usbLabel)
+            scan.total > 0 -> getString(R.string.video_internal, scan.total)
+            else -> getString(R.string.video_no_usb)
+        }
+
+        videoChips.removeAllViews()
+        if (!scan.hasPermission) {
+            videoChips.addView(makeChip(getString(R.string.video_allow), R.drawable.ic_usb, highlight = true) {
+                requestMissingPermissions()
+            })
+            return
+        }
+        for (video in scan.recent) {
+            videoChips.addView(makeChip(video.title, R.drawable.ic_play, maxWidthDp = 220) { play(video) })
+        }
+    }
+
+    private fun play(video: UsbVideos.Video) {
+        val pkg = apps.resolve(Slot.VIDEO)?.packageName
+        for (intent in videos.playIntents(video, pkg)) {
+            try {
+                startActivity(intent)
+                return
+            } catch (_: Exception) {
+            }
+        }
+        Toast.makeText(this, R.string.video_play_failed, Toast.LENGTH_SHORT).show()
     }
 
     private fun makeChip(
         text: String,
         icon: Int?,
         highlight: Boolean = false,
-        onLongClick: (() -> Unit)? = null,
+        maxWidthDp: Int = 0,
         onClick: () -> Unit,
     ): TextView {
         val color = getColor(if (highlight) R.color.accent_1 else R.color.text_primary)
@@ -345,11 +441,13 @@ class MainActivity : Activity() {
             setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimension(R.dimen.chip_text))
             gravity = Gravity.CENTER_VERTICAL
             isSingleLine = true
+            ellipsize = TextUtils.TruncateAt.END
+            if (maxWidthDp > 0) maxWidth = dp(maxWidthDp)
             setBackgroundResource(R.drawable.bg_chip)
-            setPadding(dp(14), 0, dp(16), 0)
+            setPadding(dp(12), 0, dp(16), 0)
             if (icon != null) {
                 val d = getDrawable(icon)!!.mutate()
-                d.setTint(color)
+                d.setTint(if (highlight) color else getColor(R.color.accent_1))
                 d.setBounds(0, 0, dp(18), dp(18))
                 setCompoundDrawablesRelative(d, null, null, null)
                 compoundDrawablePadding = dp(6)
@@ -359,78 +457,7 @@ class MainActivity : Activity() {
                 LinearLayout.LayoutParams.MATCH_PARENT,
             ).apply { marginEnd = dp(8) }
             setOnClickListener { onClick() }
-            if (onLongClick != null) setOnLongClickListener { onLongClick(); true }
         }
-    }
-
-    private fun searchVideos(query: String) {
-        val pkg = apps.resolve(Slot.VIDEO)?.packageName
-        for (intent in VideoSearches.searchIntents(pkg, query)) {
-            try {
-                startActivity(intent)
-                return
-            } catch (_: Exception) {
-            }
-        }
-        Toast.makeText(this, R.string.search_failed, Toast.LENGTH_SHORT).show()
-    }
-
-    /** Diálogo de búsqueda libre, con opción de guardarla como atajo. */
-    private fun promptSearch() {
-        val input = searchField()
-        AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
-            .setTitle(R.string.search_dialog_title)
-            .setView(wrapField(input))
-            .setPositiveButton(R.string.search_go) { _, _ ->
-                input.text.toString().trim().takeIf { it.isNotEmpty() }?.let { searchVideos(it) }
-            }
-            .setNeutralButton(R.string.search_save) { _, _ ->
-                input.text.toString().trim().takeIf { it.isNotEmpty() }?.let {
-                    searches.add(it)
-                    renderChips()
-                    searchVideos(it)
-                }
-            }
-            .setNegativeButton(R.string.search_cancel, null)
-            .show()
-        input.requestFocus()
-    }
-
-    private fun promptAddSearch() {
-        val input = searchField()
-        AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
-            .setTitle(R.string.search_add_title)
-            .setView(wrapField(input))
-            .setPositiveButton(R.string.search_save) { _, _ ->
-                searches.add(input.text.toString())
-                renderChips()
-            }
-            .setNegativeButton(R.string.search_cancel, null)
-            .show()
-        input.requestFocus()
-    }
-
-    private fun confirmRemoveSearch(query: String) {
-        AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
-            .setTitle(getString(R.string.search_remove_title, query))
-            .setPositiveButton(R.string.search_remove) { _, _ ->
-                searches.remove(query)
-                renderChips()
-            }
-            .setNegativeButton(R.string.search_cancel, null)
-            .show()
-    }
-
-    private fun searchField() = EditText(this).apply {
-        setHint(R.string.search_hint)
-        isSingleLine = true
-        inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
-        imeOptions = EditorInfo.IME_ACTION_DONE
-    }
-
-    private fun wrapField(field: EditText) = FrameLayout(this).apply {
-        setPadding(dp(20), dp(8), dp(20), 0)
-        addView(field)
     }
 
     // ================================================================ bluetooth
@@ -565,11 +592,16 @@ class MainActivity : Activity() {
         }
     }
 
-    private fun requestLocation() {
-        requestPermissions(
-            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
-            REQ_LOCATION,
-        )
+    /** Pide de una vez los permisos que falten: ubicación (velocímetro) y lectura de la USB. */
+    private fun requestMissingPermissions() {
+        val missing = buildList {
+            if (!speed.hasPermission()) {
+                add(Manifest.permission.ACCESS_FINE_LOCATION)
+                add(Manifest.permission.ACCESS_COARSE_LOCATION)
+            }
+            if (!videos.hasPermission()) add(videos.permission)
+        }
+        if (missing.isNotEmpty()) requestPermissions(missing.toTypedArray(), REQ_PERMISSIONS)
     }
 
     // ================================================================ apps
@@ -577,7 +609,6 @@ class MainActivity : Activity() {
     private fun reloadApps() {
         apps.load {
             gridAdapter.items = apps.apps
-            refreshAppButtons()
             renderBt()
         }
     }
@@ -606,7 +637,6 @@ class MainActivity : Activity() {
             .setTitle(getString(R.string.pick_app_title, getString(slot.title)))
             .setItems(list.map { it.label }.toTypedArray()) { _, which ->
                 apps.assign(slot, list[which])
-                refreshAppButtons()
                 renderBt()
             }
             .show()
@@ -644,6 +674,7 @@ class MainActivity : Activity() {
     private fun dp(value: Int) = (value * resources.displayMetrics.density).toInt()
 
     private companion object {
-        const val REQ_LOCATION = 1
+        const val REQ_PERMISSIONS = 1
+        const val REQ_PHOTO = 2
     }
 }

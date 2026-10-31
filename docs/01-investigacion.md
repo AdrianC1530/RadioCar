@@ -30,8 +30,8 @@ Traen un Android AOSP genérico con un launcher hecho para vender, no para usar.
 ## Por qué uno propio
 
 - La T3L tiene **1 GB de RAM** y un CPU Cortex-A7 lento: cada MB cuenta, sobre todo para ver videos.
-- Los launchers genéricos no están pensados para el uso real del carro: **videos de música y
-  música BT del teléfono**.
+- Los launchers genéricos no están pensados para el uso real del carro: **videos desde una
+  memoria USB en el reproductor de fábrica y música BT del teléfono**.
 - Uno propio se adapta al gusto (tema verde camaleón de la F-150) y no trae anuncios ni rastreo.
 
 ## Riesgos que se evitan

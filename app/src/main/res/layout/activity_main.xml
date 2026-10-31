@@ -3,7 +3,7 @@
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_home">
+    android:background="@color/bg">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -156,6 +156,7 @@
                 </LinearLayout>
 
                 <TextView
+                    android:id="@+id/badge"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
@@ -179,7 +180,7 @@
                 android:layout_weight="1"
                 android:orientation="horizontal">
 
-                <!-- ===== Videos de música ===== -->
+                <!-- ===== Videos (memoria USB) ===== -->
                 <LinearLayout
                     android:id="@+id/video_card"
                     android:layout_width="0dp"
@@ -246,7 +247,7 @@
                             android:layout_weight="1" />
 
                         <include
-                            android:id="@+id/btn_video_music"
+                            android:id="@+id/btn_files"
                             layout="@layout/app_button"
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
@@ -256,7 +257,7 @@
 
                     <Space android:layout_width="1dp" android:layout_height="0dp" android:layout_weight="1" />
 
-                    <!-- Búsquedas guardadas (atajos) -->
+                    <!-- Últimos videos de la USB (un toque = reproducir) -->
                     <HorizontalScrollView
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/chip_height"
@@ -378,7 +379,7 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- ===== Reproduciendo ahora (YouTube, BT, lo que suene) ===== -->
+            <!-- ===== Reproduciendo ahora (video, BT, lo que suene) ===== -->
             <FrameLayout
                 android:id="@+id/media_card"
                 android:layout_width="match_parent"

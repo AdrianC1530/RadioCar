@@ -15,7 +15,8 @@
 | Permiso | Para qué | Cómo |
 |---|---|---|
 | Ubicación | Velocímetro GPS | Lo pide al abrir (o toca el recuadro de km/h) |
-| Acceso a notificaciones | Ver y controlar lo que suena (YouTube, BT…) | Toca la barra "Reproduciendo ahora" → activa *RadioCar · control de música* |
+| Archivos / videos | Leer los videos de la memoria USB | Lo pide al abrir (o toca *Permitir acceso a la USB*) |
+| Acceso a notificaciones | Ver y controlar lo que suena (video, música BT…) | Toca la barra "Reproduciendo ahora" → activa *RadioCar · control de música* |
 
 Si la radio esconde el ajuste de notificaciones, usa ADB (abajo).
 
@@ -27,8 +28,9 @@ Requiere activar *Opciones de desarrollador → Depuración USB* en la radio
 ```powershell
 $adb = "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe"
 & $adb connect <IP-DE-LA-RADIO>:5555        # solo si es por Wi-Fi
-& $adb install -r dist\RadioCar-0.2.0.apk
+& $adb install -r dist\RadioCar-0.3.0.apk
 & $adb shell pm grant com.radiocar.launcher android.permission.ACCESS_FINE_LOCATION
+& $adb shell pm grant com.radiocar.launcher android.permission.READ_EXTERNAL_STORAGE
 & $adb shell cmd notification allow_listener com.radiocar.launcher/com.radiocar.launcher.MediaListenerService
 & $adb shell am start -n com.radiocar.launcher/.MainActivity
 ```

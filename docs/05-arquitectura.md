@@ -20,7 +20,8 @@ app/src/main/java/com/radiocar/launcher/
 ├── MediaHub.kt              Lee/controla lo que suena (MediaSessionManager)
 ├── MediaListenerService.kt  Listener de notificaciones (Android lo exige para MediaHub)
 ├── BtStatus.kt              Teléfono conectado por Bluetooth (si Android lo ve)
-├── VideoSearches.kt         Atajos de búsqueda + intents para buscar en YouTube/NewPipe
+├── UsbVideos.kt             Detecta la USB, lista sus videos y arma el intent para reproducirlos
+├── Backgrounds.kt           Fondos (Horizonte camaleón dibujado por código, Aurora, Negro, foto)
 ├── SpeedTracker.kt          Velocímetro GPS
 └── AppGridAdapter.kt        Cuadrícula del cajón de apps
 app/src/main/res/
@@ -43,8 +44,8 @@ suelen ser el **mismo paquete** con dos actividades distintas.
 
 | Slot | Paquetes probados |
 |---|---|
-| VIDEO | YouTube, ReVanced, NewPipe, SmartTube |
-| MUSIC | YT Music, Spotify, Deezer… |
+| VIDEO | Reproductor de fábrica (`com.tw.video`…), VLC, MX Player |
+| FILES | Explorador de fábrica (`com.tw.filemanager`…), DocumentsUI, MiXplorer |
 | BT_MUSIC | `com.tw.btmusic`, `com.tw.bt`, `com.syu.*` |
 | PHONE | `com.tw.bt`, `com.syu.bt`, marcador |
 | RADIO | `com.tw.radio`, `com.topway.radio`… |
@@ -66,13 +67,27 @@ Muchas Topway usan un **chip BT aparte** controlado por su propia app: ahí Andr
 teléfono y la tarjeta muestra un texto genérico. Se detecta música BT también por el paquete
 de la sesión (`com.android.bluetooth`, o el paquete BT de fábrica).
 
-## Búsqueda de videos
+## Videos de la USB (`UsbVideos`)
 
-`VideoSearches.searchIntents()` prueba en orden:
+1. `StorageManager.storageVolumes` → volúmenes **extraíbles y montados** (la USB/SD).
+   La ruta sale de `getPath()` (oculto, por reflexión) en Android 8.1, o de `getDirectory()` en 11+.
+2. Consulta el índice de medios (`MediaStore.Video`) filtrando por la ruta de la USB,
+   ordenado por fecha. Si la USB aún no está indexada, recorre carpetas (4 niveles, máx. 2000 archivos).
+3. Si no hay USB, muestra los videos de la memoria interna.
+4. Para reproducir: `ACTION_VIEW` con `video/*` dirigido al reproductor elegido.
+   En Android < 10 se envía la ruta `file://` (los reproductores de Topway la entienden mejor);
+   para eso se relaja `StrictMode` (`FileUriExposedException`). En 10+ se usa `content://`.
+5. Se refresca en `onResume` y con los broadcasts `MEDIA_MOUNTED/UNMOUNTED/EJECT/SCANNER_FINISHED`.
+   Todo el escaneo corre en un hilo aparte.
 
-1. `ACTION_SEARCH` con extra `query` (YouTube oficial / ReVanced).
-2. `ACTION_VIEW` de `youtube.com/results?search_query=…` en la app elegida (NewPipe…).
-3. El mismo enlace en cualquier app (navegador).
+## Fondos (`Backgrounds`)
+
+- **Horizonte camaleón**: un `Drawable` propio que se dibuja según el tamaño real de la pantalla
+  (sin imágenes): franja de color a lo ancho + máscara vertical que la apaga hacia arriba y abajo
+  + línea de horizonte fina + halo central. Pensado para pantalla horizontal.
+- **Foto propia**: `ACTION_GET_CONTENT` → se reduce (`inSampleSize`), se recorta al centro a
+  1024×600 y se guarda como `files/fondo.jpg`. Al cargarla se le pinta encima un degradado oscuro
+  para que el texto se lea. No depende de que la USB siga puesta.
 
 ## Probar sin la radio
 
