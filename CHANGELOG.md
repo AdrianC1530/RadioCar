@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.5.0 — 2026-10-31
+
+Ajustes con los datos reales de la radio (Diagnóstico): es una Allwinner T3 con firmware
+**NWD** (`k2001-nwd`) y **Android 7.1**, no Topway.
+
+- **Protección de inicio** (servicio de accesibilidad): el sistema volvía a poner el launcher de
+  fábrica (`com.android.launcher`); ahora RadioCar vuelve al frente solo. Aviso de configuración
+  al abrir y nueva opción *Pantalla de inicio*.
+- **Bluetooth**: Música BT y Teléfono abren la app BT real (`com.nwd.android.phone`). Ya no se abre
+  el Bluetooth de Android, que es otro distinto y le pedía conexión al iPhone.
+- **Reloj** más grande, letra normal (no delgada) y color sólido.
+- **Tema claro / oscuro**: *Automático* (claro de 6:00 a 18:30), *Claro* o *Oscuro*. El claro se
+  lee mucho mejor a contraluz.
+- Apps NWD reconocidas: radio, video, gestor de archivos, teléfono.
+- Diagnóstico: estado de inicio/protección/tema y pantallas internas de las apps de fábrica.
+
+![v0.5 claro](docs/img/inicio-v0.5-claro.png)
+
 ## 0.4.0 — 2026-10-31
 
 Correcciones tras la primera prueba en la radio.

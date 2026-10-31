@@ -43,13 +43,13 @@ class AppRepository(private val context: Context) {
         ),
         RADIO(
             "radio", R.string.slot_radio, R.drawable.ic_radio,
-            listOf("com.tw.radio", "com.topway.radio", "com.syu.radio", "com.android.fmradio"),
+            listOf("com.nwd.radio", "com.tw.radio", "com.topway.radio", "com.syu.radio", "com.android.fmradio"),
             listOf("radio", "fm"),
         ),
         VIDEO(
             "video", R.string.slot_video, R.drawable.ic_video,
             listOf(
-                "com.tw.video", "com.tw.videoplayer", "com.tw.media.video", "com.syu.video",
+                "com.nwd.android.video.ui", "com.tw.video", "com.tw.videoplayer", "com.tw.media.video", "com.syu.video",
                 "org.videolan.vlc", "com.mxtech.videoplayer.ad", "com.mxtech.videoplayer.pro",
             ),
             listOf("video", "vídeo", "视频", "reproductor", "movie", "película"),
@@ -57,20 +57,21 @@ class AppRepository(private val context: Context) {
         FILES(
             "files", R.string.slot_files, R.drawable.ic_folder,
             listOf(
-                "com.tw.twfileexplore", "com.tw.filemanager", "com.tw.file", "com.android.documentsui",
+                "com.nwd.filemanager", "com.tw.twfileexplore", "com.tw.filemanager", "com.tw.file", "com.android.documentsui",
                 "com.google.android.documentsui", "com.mixplorer", "com.ghisler.android.TotalCommander",
             ),
             listOf("archivos", "explorador", "gestor", "file", "files"),
         ),
         BT_MUSIC(
             "bt_music", R.string.slot_bt_music, R.drawable.ic_bluetooth,
-            listOf("com.tw.btmusic", "com.tw.bt", "com.syu.btmusic", "com.syu.bt"),
+            // En NWD la música BT es una pestaña de la app «Teléfono» (com.nwd.android.phone).
+            listOf("com.tw.btmusic", "com.nwd.android.phone", "com.tw.bt", "com.syu.btmusic", "com.syu.bt"),
             listOf("bt music", "música bt", "musica bt", "bluetooth music", "a2dp", "btmusic"),
             preferKeywords = true,
         ),
         PHONE(
             "phone", R.string.slot_phone, R.drawable.ic_phone,
-            listOf("com.tw.bt", "com.syu.bt", "com.android.dialer"),
+            listOf("com.nwd.android.phone", "com.tw.bt", "com.syu.bt", "com.android.dialer"),
             listOf("bluetooth", "teléfono", "telefono", "phone", "llamada"),
         ),
         SETTINGS(

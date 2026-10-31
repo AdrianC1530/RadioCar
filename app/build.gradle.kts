@@ -11,8 +11,8 @@ android {
         // La Topway T3L corre Android 8.1 (API 27) aunque diga "10".
         minSdk = 24
         targetSdk = 36
-        versionCode = 4
-        versionName = "0.4.0"
+        versionCode = 5
+        versionName = "0.5.0"
     }
 
     buildTypes {

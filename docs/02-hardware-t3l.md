@@ -1,53 +1,59 @@
-# 02 · Hardware: Topway T3L
+# 02 · Hardware de la radio
 
-Datos tomados de *Ajustes → Estado de la Radio* (octubre 2026):
+## Esta radio (verificado con el Diagnóstico de RadioCar, octubre 2026)
 
 | Campo | Valor |
 |---|---|
-| Modelo | A7 |
-| Procesador | TOPWAY T3L (Allwinner T3, 4× Cortex-A7 ~1.2 GHz) |
-| RAM | 1 GB |
-| Almacenamiento | 16 GB |
-| Android (según la radio) | 10 — probablemente 8.1 (API 27) real |
-| Pantalla | 1024×600, 160 dpi (por eso RadioCar agranda su interfaz) |
-| Nombre Bluetooth | **BC8-Android** (módulo BT propio, no la pila de Android) |
+| Marca en pantalla | HC-Racing |
+| Placa | Allwinner QUAD-CORE **T3**, modelo `k2001-nwd` (en Ajustes dice "TOPWAY T3L", modelo A7) |
+| Firmware | **NWD** (no Topway) |
+| Android | Dice "10", pero es **Android 7.1 (API 25)** |
+| RAM / almacenamiento | 1 GB / 16 GB |
+| Pantalla | 1024×600, **160 dpi** (RadioCar usa 240 dpi para que todo se vea grande) |
+| Bluetooth del teléfono | Módulo propio **"BC8-Android"**, PIN 0000 (servicio `com.bt.bc03`), no la pila de Android |
 | Vehículo | Ford F-150 2013 |
 
-## Apps de fábrica (verificadas en otra T3L)
+### Apps de fábrica
 
-Fuente: inventario de paquetes del proyecto
-[t3l-android-headunit-revival](https://github.com/nurfaizfoat/t3l-android-headunit-revival)
-(misma placa, Android 8.1, 160 dpi).
+| Función | Paquete / actividad |
+|---|---|
+| Launcher de fábrica | `com.android.launcher/com.android.launcher2.Launcher` |
+| Teléfono + Música BT (misma app, pestañas) | `com.nwd.android.phone/.home_horizontalActivity` |
+| Radio FM | `com.nwd.radio/.home_horizontalActivity` (servicio `com.nwd.radio.service`) |
+| Reproductor de video | `com.nwd.android.video.ui/.home_horizontalActivity` |
+| Música local | `com.nwd.android.music.ui/.home_horizontalActivity` |
+| Gestor de archivos | `com.nwd.filemanager/.FileManager` |
+| Servicio BT | `com.bt.bc03` («BTService») — **no tocar** |
+
+### Lo que significa para RadioCar
+
+- **El launcher de fábrica se vuelve a imponer**: aunque elijas RadioCar como app de inicio, el
+  sistema vuelve a poner `com.android.launcher` (el Diagnóstico lo mostraba como inicio por defecto).
+  Solución sin cables: la **protección de inicio** de RadioCar (servicio de accesibilidad que trae
+  RadioCar al frente cuando aparece el launcher de fábrica). Ver [03 · Instalación](03-instalacion.md).
+- **Bluetooth**: Android no ve el teléfono conectado a "BC8-Android". Los botones Música BT y
+  Teléfono abren `com.nwd.android.phone`. Nunca se abre el Bluetooth de Android (es otro distinto y
+  confundía al iPhone).
+- **No hay protocolo TXZNet** (eso es de Topway): el Diagnóstico no recibió avisos.
+
+## Pendiente
+
+| Dato | Estado |
+|---|---|
+| ¿El reproductor NWD abre videos enviados desde RadioCar? | _pendiente_ |
+| Pantalla interna para abrir directo la pestaña de Música BT | _pendiente_ (ver «PANTALLAS DE APPS DE FÁBRICA» en el Diagnóstico) |
+| ¿La app BT publica la canción (MediaSession)? | _pendiente_ |
+
+---
+
+## Referencia: otra T3L con firmware Topway
+
+Del proyecto [t3l-android-headunit-revival](https://github.com/nurfaizfoat/t3l-android-headunit-revival)
+(Android 8.1, 160 dpi). RadioCar también reconoce estas apps:
 
 | Función | Paquete / actividad |
 |---|---|
 | Launcher de fábrica ("Theme") | `com.dofun.variety/com.dofun.overseasvariety.Launcher` |
-| Bluetooth (teléfono y música BT) | `com.tw.bt/.ATBluetoothActivity` |
-| Radio FM | `com.tw.radio/.RadioActivity` |
-| Reproductor de video | `com.tw.video/.VideoActivity` |
-| Música local | `com.tw.music/.MusicActivity` |
-| Explorador de archivos | `com.tw.twfileexplore/.ui.view.activity.ExploreActivity` |
-| Ecualizador | `com.tw.eq/.EQActivity` |
-| Volante | `com.tw.keypad/.SteeringWheelActivity` |
-| Núcleo / servicios | `com.tw.core`, `com.tw.service` — **no tocar** |
-
-## Detalles importantes
-
-- **"Theme" se impone**: tiene un servicio en primer plano y el botón Inicio lo abre. Para usar
-  otro launcher hay que desactivarlo (ver [03 · Instalación](03-instalacion.md#2--dejarlo-como-pantalla-de-inicio)).
-- **El Bluetooth del teléfono no pasa por Android**: lo maneja el módulo BC8 (proceso nativo
-  `gocsdk` en `/dev/ttyS3`) a través de `com.tw.bt`. Por eso Android no "ve" el teléfono conectado.
-- Las apps de fábrica hablan con el launcher por broadcasts **TXZNet**
-  (`com.txznet.launcher.<radio|bt|btmusic|call>.action.send/recv`). RadioCar solo **escucha**
-  los `recv` (para el diagnóstico y, si viene, el título de la canción BT); nunca envía comandos.
-
-## Pendiente de confirmar en ESTA radio
-
-Usa RadioCar → F-150 → **Diagnóstico** y saca una foto.
-
-| Dato | Valor |
-|---|---|
-| API real | _pendiente_ |
-| ¿Mismos paquetes `com.tw.*` que la otra T3L? | _pendiente_ |
-| ¿El reproductor de fábrica abre videos desde RadioCar? | _pendiente_ |
-| ¿La app BT anuncia la canción por TXZNet? | _pendiente_ |
+| Bluetooth | `com.tw.bt/.ATBluetoothActivity` |
+| Radio FM | `com.tw.radio/.RadioActivity` (protocolo TXZNet) |
+| Video / música / archivos | `com.tw.video`, `com.tw.music`, `com.tw.twfileexplore` |

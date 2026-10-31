@@ -39,6 +39,24 @@ Los controles de la barra "Reproduciendo ahora" también funcionan con la músic
 - Anterior / play-pausa / siguiente.
 - El brillo de la barra toma el color de la carátula.
 
+## Tema claro / oscuro
+
+Insignia **F-150** → **Tema**:
+
+| Tema | Cuándo |
+|---|---|
+| **Automático** (por defecto) | Claro de 6:00 a 18:30, oscuro de noche. Cambia solo |
+| **Claro** | Siempre claro: lo mejor con el sol de frente |
+| **Oscuro** | Siempre oscuro |
+
+| Claro (día) | Oscuro (noche) |
+|---|---|
+| ![Claro](img/inicio-v0.5-claro.png) | ![Oscuro](img/inicio-v0.5-oscuro.png) |
+
+## Tamaño
+
+Insignia **F-150** → **Tamaño de la pantalla**: Grande (por defecto), Mediano o Pequeño.
+
 ## Fondo de pantalla
 
 Toca la insignia **F-150** (arriba a la derecha) o **mantén pulsado** un espacio vacío del fondo.

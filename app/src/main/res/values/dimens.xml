@@ -9,9 +9,9 @@
     <dimen name="card_pad">12dp</dimen>
     <dimen name="card_radius">20dp</dimen>
 
-    <dimen name="top_clock_size">36sp</dimen>
-    <dimen name="greeting_size">15sp</dimen>
-    <dimen name="date_size">12sp</dimen>
+    <dimen name="top_clock_size">50sp</dimen>
+    <dimen name="greeting_size">17sp</dimen>
+    <dimen name="date_size">14sp</dimen>
     <dimen name="speed_size">18sp</dimen>
 
     <dimen name="card_title_size">16sp</dimen>

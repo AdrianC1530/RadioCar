@@ -1,10 +1,12 @@
 # RadioCar
 
-Launcher (pantalla de inicio) moderno y liviano para la radio Android china
-**Topway T3L** (pantalla horizontal 1024×600) de una **Ford F-150 2013**, pensado para lo que
+Launcher (pantalla de inicio) moderno y liviano para radios Android chinas
+**Allwinner T3 / T3L** (firmware NWD o Topway, pantalla horizontal 1024×600) — hecho para una **Ford F-150 2013**, pensado para lo que
 más se usa en el carro: **videos desde la memoria USB** y **música del teléfono por Bluetooth**.
 
-![Pantalla de inicio](docs/img/inicio-v0.4.png)
+| Claro (día, a contraluz) | Oscuro (noche) |
+|---|---|
+| ![Claro](docs/img/inicio-v0.5-claro.png) | ![Oscuro](docs/img/inicio-v0.5-oscuro.png) |
 
 - **No toca firmware, ni root, ni el MCU/CAN.** Es una app normal; el launcher de fábrica
   sigue instalado y se puede volver a él en cualquier momento.
@@ -21,6 +23,8 @@ más se usa en el carro: **videos desde la memoria USB** y **música del teléfo
 | **Barra superior** | Hora, fecha, saludo, velocímetro GPS e insignia F-150 (tócala para los ajustes: fondo, tamaño, launcher de fábrica, diagnóstico) |
 | **Barra lateral** | Inicio, Navegación, Radio FM, Teléfono, todas las apps, Ajustes |
 | **Fondo** | Horizonte camaleón (por defecto), Aurora, Negro o **una foto tuya** |
+| **Tema** | Automático (claro de día, oscuro de noche), Claro u Oscuro |
+| **Inicio fijo** | Protección de inicio: si la radio vuelve a poner su launcher, RadioCar regresa al frente |
 
 **Mantén pulsado** cualquier botón para elegir qué app abre. Detalles en [docs/04-uso.md](docs/04-uso.md).
 
@@ -30,9 +34,8 @@ más se usa en el carro: **videos desde la memoria USB** y **música del teléfo
    y cópialo a un pendrive.
 2. En la radio: administrador de archivos → toca el APK → instalar.
 3. Ábrelo y acepta los permisos (ubicación y archivos).
-4. **Topway T3L:** toca la insignia **F-150** → **Launcher de fábrica (Theme)** → *Abrir ajustes* →
-   **Desactivar**. Sin esto, el botón Inicio sigue abriendo el launcher de fábrica.
-5. Pulsa **Inicio** → **RadioCar** → **Siempre**.
+4. En el aviso **Pantalla de inicio** toca **Protección** y activa *RadioCar · protección de inicio*.
+   Sin esto, la radio vuelve a poner su launcher de fábrica al encender o al pulsar ⌂.
 
 Guía completa (permisos, ADB, cómo volver al de fábrica): [docs/03-instalacion.md](docs/03-instalacion.md).
 

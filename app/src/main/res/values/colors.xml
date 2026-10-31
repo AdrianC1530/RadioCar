@@ -21,4 +21,11 @@
     <color name="track">#26FFFFFF</color>
     <color name="glow_green">#3D2BE38B</color>
     <color name="glow_violet">#267B6CFF</color>
+
+    <color name="surface_soft">#14FFFFFF</color>
+    <color name="surface_stroke">#1FFFFFFF</color>
+    <color name="chip_bg">#0FFFFFFF</color>
+    <color name="chip_stroke">#29FFFFFF</color>
+    <color name="badge_bg">#1A2BE38B</color>
+    <color name="badge_stroke">#802BE38B</color>
 </resources>

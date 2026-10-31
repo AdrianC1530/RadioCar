@@ -12,8 +12,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.graphics.LinearGradient
-import android.graphics.Shader
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Build
@@ -31,7 +29,6 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
-import android.widget.TextClock
 import android.widget.TextView
 import android.widget.Toast
 import com.radiocar.launcher.AppRepository.Slot
@@ -76,12 +73,20 @@ class MainActivity : Activity() {
     private var ticks = 0
     @Volatile private var scanning = false
 
+    /** Tema con el que se creó la pantalla (para cambiar solo de claro a oscuro según la hora). */
+    private var nightApplied = false
+
     /** Un "tic" por segundo mientras la pantalla está visible. */
     private val ticker = object : Runnable {
         override fun run() {
             updateProgress()
             updateGreeting()
-            if (ticks++ % 5 == 0) refreshBt()
+            if (ticks % 5 == 0) refreshBt()
+            if (ticks % 30 == 0 && UiScale.isNightNow(this@MainActivity) != nightApplied) {
+                recreate()
+                return
+            }
+            ticks++
             handler.postDelayed(this, 1000L)
         }
     }
@@ -114,6 +119,7 @@ class MainActivity : Activity() {
             // Permite pasar rutas file:// al reproductor de fábrica (es lo que mejor entienden).
             StrictMode.setVmPolicy(StrictMode.VmPolicy.Builder().build())
         }
+        nightApplied = UiScale.isNightNow(this)
         setContentView(R.layout.activity_main)
 
         apps = AppRepository(this)
@@ -153,10 +159,22 @@ class MainActivity : Activity() {
         })
 
         requestMissingPermissions()
+
+        // Recordar cuál es el launcher de fábrica (lo usa la protección de inicio) y, si RadioCar
+        // aún no queda fijo como inicio, explicarlo una vez al abrir.
+        bridge.factoryHome()
+        if (!HomeGuard.isEnabled(this) && !HomeGuard.isDefaultHome(this)) {
+            handler.postDelayed({ if (!isFinishing) showHomeSetup() }, 1500L)
+        }
     }
 
     override fun onResume() {
         super.onResume()
+        HomeGuard.setBypass(this, false)
+        if (UiScale.isNightNow(this) != nightApplied) {
+            recreate()
+            return
+        }
         media.start()
         speed.start()
         refreshVideos()
@@ -165,6 +183,8 @@ class MainActivity : Activity() {
 
     override fun onPause() {
         super.onPause()
+        handler.removeCallbacks(ticker)
+        if (!::media.isInitialized) return
         media.stop()
         speed.stop()
         handler.removeCallbacks(ticker)
@@ -247,7 +267,6 @@ class MainActivity : Activity() {
         }
 
         mediaArt.clipToOutline = true
-        applyChameleonGradient(findViewById<TextClock>(R.id.clock))
         setGlow(getColor(R.color.accent_1))
         showArtPlaceholder()
         updateGreeting()
@@ -326,18 +345,6 @@ class MainActivity : Activity() {
         }
     }
 
-    /** Degradado verde → turquesa → violeta sobre el texto (el "camaleón"). */
-    private fun applyChameleonGradient(text: TextView) {
-        val colors = intArrayOf(getColor(R.color.accent_1), getColor(R.color.accent_2), getColor(R.color.accent_3))
-        text.addOnLayoutChangeListener { v, left, _, right, _, _, _, _, _ ->
-            val width = (right - left).toFloat()
-            if (width > 0) {
-                (v as TextView).paint.shader = LinearGradient(0f, 0f, width, 0f, colors, null, Shader.TileMode.CLAMP)
-                v.invalidate()
-            }
-        }
-    }
-
     private fun updateGreeting() {
         val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
         val res = when {
@@ -354,29 +361,93 @@ class MainActivity : Activity() {
 
     // ================================================================ ajustes
 
+    private fun dialogTheme() =
+        if (nightApplied) android.R.style.Theme_Material_Dialog_Alert
+        else android.R.style.Theme_Material_Light_Dialog_Alert
+
     private fun showSettings() {
-        val items = arrayOf(
-            getString(R.string.settings_background),
-            getString(R.string.settings_size),
-            getString(R.string.settings_factory),
-            getString(R.string.settings_diagnostics),
+        val actions = listOf<Pair<Int, () -> Unit>>(
+            R.string.settings_home to { showHomeSetup() },
+            R.string.settings_theme to { showThemePicker() },
+            R.string.settings_size to { showSizePicker() },
+            R.string.settings_background to { showBackgroundPicker() },
+            R.string.settings_open_factory to { openFactoryLauncher() },
+            R.string.settings_factory to { showFactoryLauncher() },
+            R.string.settings_diagnostics to { showDiagnostics() },
         )
-        AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
+        AlertDialog.Builder(this, dialogTheme())
             .setTitle(R.string.settings_title)
-            .setItems(items) { _, which ->
-                when (which) {
-                    0 -> showBackgroundPicker()
-                    1 -> showSizePicker()
-                    2 -> showFactoryLauncher()
-                    3 -> showDiagnostics()
+            .setItems(actions.map { getString(it.first) }.toTypedArray()) { _, which -> actions[which].second() }
+            .show()
+    }
+
+    /** Estado y pasos para que RadioCar quede fijo como pantalla de inicio. */
+    private fun showHomeSetup() {
+        val isHome = HomeGuard.isDefaultHome(this)
+        val guard = HomeGuard.isEnabled(this)
+        AlertDialog.Builder(this, dialogTheme())
+            .setTitle(R.string.home_title)
+            .setMessage(
+                getString(
+                    R.string.home_body,
+                    getString(if (isHome) R.string.home_yes else R.string.home_no),
+                    getString(if (guard) R.string.guard_on else R.string.guard_off),
+                ),
+            )
+            .setPositiveButton(R.string.home_guard) { _, _ ->
+                tryStart(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)) ||
+                    tryStart(Intent(Settings.ACTION_SETTINGS))
+            }
+            .setNeutralButton(R.string.home_choose) { _, _ ->
+                if (!tryStart(Intent(Settings.ACTION_HOME_SETTINGS))) {
+                    Toast.makeText(this, R.string.home_settings_hint, Toast.LENGTH_LONG).show()
+                    tryStart(Intent(Settings.ACTION_SETTINGS))
                 }
+            }
+            .setNegativeButton(R.string.close, null)
+            .show()
+    }
+
+    private fun showThemePicker() {
+        val themes = UiScale.Theme.entries
+        AlertDialog.Builder(this, dialogTheme())
+            .setTitle(R.string.settings_theme)
+            .setSingleChoiceItems(
+                themes.map { getString(it.title) }.toTypedArray(),
+                themes.indexOf(UiScale.theme(this)),
+            ) { dialog, which ->
+                dialog.dismiss()
+                UiScale.setTheme(this, themes[which])
+                if (UiScale.isNightNow(this) != nightApplied) recreate()
             }
             .show()
     }
 
+    /** Abre el launcher de fábrica a propósito (la protección no lo tapa hasta volver a RadioCar). */
+    private fun openFactoryLauncher() {
+        val home = bridge.factoryHome() ?: run {
+            Toast.makeText(this, R.string.factory_none, Toast.LENGTH_LONG).show()
+            return
+        }
+        HomeGuard.setBypass(this, true)
+        if (!tryStart(Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME).setComponent(home)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        ) {
+            HomeGuard.setBypass(this, false)
+            openAppInfo(home.packageName)
+        }
+    }
+
+    private fun tryStart(intent: Intent): Boolean = try {
+        startActivity(intent)
+        true
+    } catch (e: Exception) {
+        false
+    }
+
     private fun showSizePicker() {
         val sizes = UiScale.Size.entries
-        AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
+        AlertDialog.Builder(this, dialogTheme())
             .setTitle(R.string.settings_size)
             .setSingleChoiceItems(
                 sizes.map { getString(it.title) }.toTypedArray(),
@@ -407,19 +478,13 @@ class MainActivity : Activity() {
             pkg
         }
         val enabled = bridge.isEnabled(pkg)
-        val builder = AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
+        val builder = AlertDialog.Builder(this, dialogTheme())
             .setTitle(R.string.factory_title)
             .setMessage(getString(if (enabled) R.string.factory_body_enabled else R.string.factory_body_disabled, label))
             .setPositiveButton(R.string.factory_open_settings) { _, _ -> openAppInfo(pkg) }
             .setNegativeButton(R.string.close, null)
         if (enabled) {
-            builder.setNeutralButton(R.string.factory_open) { _, _ ->
-                try {
-                    startActivity(Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME).setComponent(home)
-                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-                } catch (_: Exception) {
-                }
-            }
+            builder.setNeutralButton(R.string.factory_open) { _, _ -> openFactoryLauncher() }
         }
         builder.show()
     }
@@ -433,7 +498,7 @@ class MainActivity : Activity() {
             setTextIsSelectable(true)
             setPadding(dp(20), dp(8), dp(20), dp(8))
         }
-        AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
+        AlertDialog.Builder(this, dialogTheme())
             .setTitle(R.string.diagnostics_title)
             .setView(android.widget.ScrollView(this).apply { addView(text) })
             .setPositiveButton(R.string.close, null)
@@ -455,7 +520,7 @@ class MainActivity : Activity() {
 
     private fun showBackgroundPicker() {
         val styles = Backgrounds.Style.entries
-        AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
+        AlertDialog.Builder(this, dialogTheme())
             .setTitle(R.string.bg_title)
             .setSingleChoiceItems(
                 styles.map { getString(it.title) }.toTypedArray(),
@@ -729,7 +794,8 @@ class MainActivity : Activity() {
         when {
             entry != null -> launch(entry)
             slot == Slot.SETTINGS -> startActivity(Intent(Settings.ACTION_SETTINGS))
-            slot == Slot.BT_MUSIC -> startActivity(Intent(Settings.ACTION_BLUETOOTH_SETTINGS))
+            // Nunca abrir el Bluetooth de Android: en estas radios es otro distinto al del teléfono.
+            slot == Slot.BT_MUSIC -> apps.resolve(Slot.PHONE)?.let { launch(it) } ?: pickApp(slot)
             else -> pickApp(slot)
         }
     }
@@ -740,7 +806,7 @@ class MainActivity : Activity() {
             Toast.makeText(this, R.string.apps_loading, Toast.LENGTH_SHORT).show()
             return
         }
-        AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
+        AlertDialog.Builder(this, dialogTheme())
             .setTitle(getString(R.string.pick_app_title, getString(slot.title)))
             .setItems(list.map { it.label }.toTypedArray()) { _, which ->
                 apps.assign(slot, list[which])

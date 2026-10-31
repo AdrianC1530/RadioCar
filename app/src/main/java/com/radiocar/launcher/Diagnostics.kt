@@ -34,6 +34,11 @@ object Diagnostics {
             "Launcher de fábrica: ${factory?.flattenToShortString() ?: "no encontrado"}" +
                 (factory?.let { if (bridge.isEnabled(it.packageName)) " (activo)" else " (DESACTIVADO)" } ?: ""),
         )
+        appendLine(
+            "RadioCar es inicio: ${if (HomeGuard.isDefaultHome(context)) "sí" else "no"} · " +
+                "Protección: ${if (HomeGuard.isEnabled(context)) "activada" else "desactivada"} · " +
+                "Tema: ${if (UiScale.isNightNow(context)) "oscuro" else "claro"}",
+        )
 
         appendLine()
         appendLine("ACCESOS")
@@ -53,6 +58,25 @@ object Diagnostics {
                 val launch = pm.getLaunchIntentForPackage(info.packageName)?.component?.shortClassName ?: "-"
                 val label = pm.getApplicationLabel(info).toString()
                 appendLine("  ${info.packageName} «$label» $launch")
+            }
+
+        // Pantallas internas de las apps de fábrica: sirven para abrir, p. ej., la música BT directo.
+        appendLine()
+        appendLine("PANTALLAS DE APPS DE FÁBRICA")
+        @Suppress("QueryPermissionsNeeded")
+        pm.getInstalledApplications(0)
+            .map { it.packageName }
+            .filter { it.startsWith("com.nwd.") || it.startsWith("com.tw.") || it.startsWith("com.bt.") }
+            .sorted()
+            .forEach { pkg ->
+                val acts = try {
+                    pm.getPackageInfo(pkg, PackageManager.GET_ACTIVITIES).activities.orEmpty()
+                        .filter { it.exported }
+                        .map { it.name.removePrefix(pkg) }
+                } catch (e: Exception) {
+                    emptyList()
+                }
+                if (acts.isNotEmpty()) appendLine("  $pkg: ${acts.take(8).joinToString(" ")}")
             }
 
         appendLine()

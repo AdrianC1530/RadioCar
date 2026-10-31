@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Tema CLARO (de día): fondo claro y textos oscuros para que se lea a contraluz -->
+    <color name="bg">#FFEEF3F1</color>
+    <color name="card">#F7FFFFFF</color>
+    <color name="card_stroke">#260B3B2A</color>
+    <color name="divider">#1A000000</color>
+    <color name="scrim">#F7F2F6F4</color>
+
+    <color name="text_primary">#FF07110D</color>
+    <color name="text_secondary">#FF3A4642</color>
+    <color name="text_tertiary">#FF5E6A66</color>
+
+    <!-- Camaleón en tonos más profundos para que contraste sobre blanco -->
+    <color name="accent_1">#FF0A9A5B</color>
+    <color name="accent_2">#FF00849E</color>
+    <color name="accent_3">#FF5544D0</color>
+    <color name="on_accent">#FFFFFFFF</color>
+
+    <color name="ripple">#330A9A5B</color>
+    <color name="track">#24000000</color>
+    <color name="glow_green">#400A9A5B</color>
+    <color name="glow_violet">#2E5544D0</color>
+
+    <color name="surface_soft">#0F0B3B2A</color>
+    <color name="surface_stroke">#2E0B3B2A</color>
+    <color name="chip_bg">#0D0B3B2A</color>
+    <color name="chip_stroke">#400B3B2A</color>
+    <color name="badge_bg">#1A0A9A5B</color>
+    <color name="badge_stroke">#B30A9A5B</color>
+</resources>

@@ -8,71 +8,65 @@
 
 1. Descarga el APK desde [Releases](https://github.com/AdrianC1530/RadioCar/releases/latest)
    y cópialo a una memoria USB.
-2. En la radio, abre el administrador de archivos (en la T3L: **TWFileExplore / Archivos**) y toca el APK.
+2. En la radio, abre el **Gestor de Archivos** y toca el APK.
    Si lo pide, permite instalar desde "orígenes desconocidos".
-3. Abre **RadioCar** desde el menú de apps y pruébalo como app normal.
+3. Abre **RadioCar** y acepta los permisos (ubicación y archivos).
+
+Para actualizar, instala el APK nuevo encima: se conservan fondo, tema, tamaño y apps elegidas.
 
 ### Opción B · ADB
 
-Requiere *Opciones de desarrollador → Depuración USB* en la radio
-(en algunas Topway piden una clave de fábrica: pídela al vendedor, no pruebes claves al azar).
-
 ```powershell
 $adb = "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe"
-& $adb connect <IP-DE-LA-RADIO>:5555        # solo si es por Wi-Fi
-& $adb install -r dist\RadioCar-0.4.0.apk
+& $adb install -r dist\RadioCar-0.5.0.apk
 & $adb shell pm grant com.radiocar.launcher android.permission.ACCESS_FINE_LOCATION
 & $adb shell pm grant com.radiocar.launcher android.permission.READ_EXTERNAL_STORAGE
 & $adb shell cmd notification allow_listener com.radiocar.launcher/com.radiocar.launcher.MediaListenerService
 ```
 
-### Permisos
+## 2 · Que RadioCar quede fijo como pantalla de inicio
 
-| Permiso | Para qué | Cómo |
-|---|---|---|
-| Ubicación | Velocímetro GPS | Lo pide al abrir (o toca el recuadro de km/h) |
-| Archivos / videos | Leer los videos de la memoria USB | Lo pide al abrir (o toca *Permitir acceso a la USB*) |
-| Acceso a notificaciones | Ver y controlar lo que suena | Toca la barra "Reproduciendo ahora" → activa *RadioCar · control de música* |
+En estas radios **elegir RadioCar como "app de inicio" no basta**: el sistema vuelve a poner el
+launcher de fábrica (al encender, o al pulsar el botón ⌂). La solución es la
+**protección de inicio** de RadioCar:
 
-## 2 · Dejarlo como pantalla de inicio
+1. Al abrir RadioCar aparece el aviso **Pantalla de inicio** (o: insignia **F-150** → *Pantalla de inicio*).
+2. Toca **Protección** → se abre *Ajustes → Accesibilidad*.
+3. Toca **RadioCar · protección de inicio** → actívala → **Aceptar**.
+4. Listo: cada vez que aparezca el launcher de fábrica, RadioCar vuelve al frente solo.
 
-En la Topway T3L, **elegir RadioCar como "app de inicio" no basta**: el launcher de fábrica
-**"Theme"** (`com.dofun.variety`) tiene un servicio propio y el botón Inicio de la radio lo abre
-directamente. Hay que **desactivar "Theme"** (no se borra; se puede reactivar cuando quieras):
+![Pantalla de inicio](img/pantalla-inicio.png)
 
-1. En RadioCar toca la insignia **F-150** (arriba a la derecha) → **Launcher de fábrica (Theme)**.
-2. Toca **Abrir ajustes** → se abre la ficha de la app "Theme".
-3. Toca **Desactivar** → **Aceptar**.
-4. Pulsa **Inicio**: ahora sale RadioCar. Si pregunta, elige **RadioCar → Siempre**.
+Opcional: en el mismo aviso, **Elegir inicio** → RadioCar → Siempre.
 
-> Antes de desactivar Theme, comprueba que RadioCar abre bien como app normal.
+> La protección solo detecta "cambió la pantalla"; no lee lo que hay en ella. Android muestra
+> un aviso genérico al activarla.
 
-### Si el botón "Desactivar" está gris
+### Usar el launcher de fábrica a propósito
 
-Con ADB:
+Insignia **F-150** → **Abrir el launcher de fábrica**. La protección no lo tapa hasta que vuelvas
+a abrir RadioCar.
 
-```powershell
-& $adb shell pm disable-user --user 0 com.dofun.variety
-& $adb shell cmd package set-home-activity --user 0 com.radiocar.launcher/.MainActivity
-```
+### Quitar RadioCar del todo
 
-## Volver al launcher de fábrica
+1. *Ajustes → Accesibilidad → RadioCar · protección de inicio* → desactivar.
+2. *Ajustes → Apps → RadioCar → Desinstalar*. La radio queda como antes.
 
-- RadioCar → insignia **F-150** → **Launcher de fábrica** → **Abrir ajustes** → **Activar**.
-  Luego pulsa Inicio y elige el original.
-- O desde *Ajustes → Apps → Theme → Activar* (el engrane de la barra lateral abre Ajustes).
-- Por ADB:
+### Alternativa avanzada (Topway "Theme")
 
-```powershell
-& $adb shell pm enable --user 0 com.dofun.variety
-& $adb shell cmd package set-home-activity --user 0 com.dofun.variety/com.dofun.overseasvariety.Launcher
-```
+En radios Topway cuyo launcher es "Theme" (`com.dofun.variety`) se puede **desactivar** desde
+F-150 → *Desactivar launcher de fábrica (avanzado)*. En la radio NWD (`com.android.launcher`)
+Android no permite desactivarlo desde la pantalla; usa la protección de inicio.
 
-## Actualizar
+## Permisos
 
-Instala el APK nuevo encima (pendrive o `adb install -r`). Se conservan el fondo, el tamaño y las apps elegidas.
+| Permiso | Para qué |
+|---|---|
+| Ubicación | Velocímetro GPS |
+| Archivos / videos | Leer los videos de la memoria USB |
+| Acceso a notificaciones | Ver y controlar lo que suena (toca la barra "Reproduciendo ahora") |
+| Accesibilidad (opcional) | Protección de inicio |
 
 ## Si algo no funciona
 
-RadioCar → insignia **F-150** → **Diagnóstico**. Muestra la versión de Android, la pantalla,
-qué app abre cada botón y las apps de fábrica instaladas. **Sácale una foto** y compártela.
+Insignia **F-150** → **Diagnóstico**. **Sácale una foto** (desliza para ver todo) y compártela.

@@ -32,14 +32,36 @@
     <string name="bt_connected">Conectado · %1$s</string>
     <string name="bt_disconnected">Sin teléfono conectado</string>
     <string name="bt_off">Bluetooth apagado</string>
-    <string name="bt_hint">Conecta tu teléfono a «%1$s»</string>
+    <string name="bt_hint">Radio «%1$s» · PIN 0000</string>
     <string name="bt_radio_name">BC8-Android</string>
+
+    <!-- Tema -->
+    <string name="settings_theme">Tema (claro / oscuro)</string>
+    <string name="theme_auto">Automático (claro de día, oscuro de noche)</string>
+    <string name="theme_light">Claro (mejor a contraluz)</string>
+    <string name="theme_dark">Oscuro</string>
+
+    <!-- Pantalla de inicio / protección -->
+    <string name="settings_home">Pantalla de inicio</string>
+    <string name="settings_open_factory">Abrir el launcher de fábrica</string>
+    <string name="home_title">Pantalla de inicio</string>
+    <string name="home_body">• App de inicio del sistema: %1$s\n• Protección de inicio: %2$s\n\nTu radio vuelve a poner su launcher de fábrica. Para que siempre salga RadioCar:\n\n1. «Protección» → busca «RadioCar · protección de inicio» → actívala → Aceptar.\n   Desde ahí, cada vez que aparezca el launcher de fábrica (al encender o al pulsar ⌂), RadioCar vuelve al frente.\n\n2. (Opcional) «Elegir inicio» → RadioCar → Siempre.</string>
+    <string name="home_yes">RadioCar ✔</string>
+    <string name="home_no">otra app ✘</string>
+    <string name="guard_on">activada ✔</string>
+    <string name="guard_off">desactivada ✘</string>
+    <string name="home_choose">Elegir inicio</string>
+    <string name="home_guard">Protección</string>
+    <string name="home_settings_hint">Ve a Apps → ⚙ → «App de inicio» y elige RadioCar</string>
+    <string name="guard_label">RadioCar · protección de inicio</string>
+    <string name="guard_description">Trae RadioCar al frente cuando aparece el launcher de fábrica de la radio (al encender o al pulsar Inicio). Solo detecta cambios de pantalla; no lee lo que hay en ella.</string>
+    <string name="guard_banner">Activa la protección de inicio para que RadioCar quede fijo</string>
 
     <!-- Ajustes de RadioCar -->
     <string name="settings_title">Ajustes de RadioCar</string>
     <string name="settings_background">Fondo de pantalla</string>
     <string name="settings_size">Tamaño de la pantalla</string>
-    <string name="settings_factory">Launcher de fábrica (Theme)</string>
+    <string name="settings_factory">Desactivar launcher de fábrica (avanzado)</string>
     <string name="settings_diagnostics">Diagnóstico (para soporte)</string>
     <string name="size_large">Grande (recomendado)</string>
     <string name="size_medium">Mediano</string>
