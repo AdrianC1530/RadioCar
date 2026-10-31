@@ -13,6 +13,12 @@
     <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
 
+    <!-- Diagnóstico: listar las apps de fábrica (BT, radio, video…) aunque no tengan ícono -->
+    <uses-permission
+        android:name="android.permission.QUERY_ALL_PACKAGES"
+        xmlns:tools="http://schemas.android.com/tools"
+        tools:ignore="QueryAllPackagesPermission" />
+
     <!-- Para listar las apps instaladas en el cajón -->
     <queries>
         <intent>

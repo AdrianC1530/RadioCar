@@ -45,7 +45,11 @@ class MainActivity : Activity() {
     private lateinit var bt: BtStatus
     private lateinit var videos: UsbVideos
     private lateinit var backgrounds: Backgrounds
+    private lateinit var bridge: FactoryBridge
     private val handler = Handler(Looper.getMainLooper())
+
+    /** Título que la app BT de fábrica anunció por TXZNet (si lo hace). */
+    private var factoryBtTitle: String? = null
 
     private lateinit var root: View
     private lateinit var greeting: TextView
@@ -99,6 +103,11 @@ class MainActivity : Activity() {
         }
     }
 
+    /** Agranda la interfaz según el tamaño elegido (la T3L viene a 160 dpi y todo se ve diminuto). */
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(UiScale.wrap(newBase))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (Build.VERSION.SDK_INT < 29) {
@@ -113,6 +122,11 @@ class MainActivity : Activity() {
         bt = BtStatus(this)
         videos = UsbVideos(this)
         backgrounds = Backgrounds(this)
+        bridge = FactoryBridge(this) { title ->
+            factoryBtTitle = title
+            renderBt()
+        }
+        bridge.register()
 
         bindViews()
         applyBackground()
@@ -160,6 +174,7 @@ class MainActivity : Activity() {
         unregisterReceiver(packageReceiver)
         unregisterReceiver(btReceiver)
         unregisterReceiver(usbReceiver)
+        bridge.unregister()
         super.onDestroy()
     }
 
@@ -240,9 +255,9 @@ class MainActivity : Activity() {
         findViewById<View>(R.id.speed_chip).setOnClickListener {
             if (!speed.hasPermission()) requestMissingPermissions()
         }
-        // Personalizar el fondo: tocar la insignia F-150 o mantener pulsado el fondo.
-        findViewById<View>(R.id.badge).setOnClickListener { showBackgroundPicker() }
-        root.setOnLongClickListener { showBackgroundPicker(); true }
+        // Ajustes de RadioCar: tocar la insignia F-150 o mantener pulsado el fondo.
+        findViewById<View>(R.id.badge).setOnClickListener { showSettings() }
+        root.setOnLongClickListener { showSettings(); true }
 
         // Videos (USB)
         setupActionButton(R.id.btn_video, Slot.VIDEO, R.drawable.ic_play, R.string.video_player, accent = true)
@@ -335,6 +350,94 @@ class MainActivity : Activity() {
             greetingRes = res
             greeting.setText(res)
         }
+    }
+
+    // ================================================================ ajustes
+
+    private fun showSettings() {
+        val items = arrayOf(
+            getString(R.string.settings_background),
+            getString(R.string.settings_size),
+            getString(R.string.settings_factory),
+            getString(R.string.settings_diagnostics),
+        )
+        AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
+            .setTitle(R.string.settings_title)
+            .setItems(items) { _, which ->
+                when (which) {
+                    0 -> showBackgroundPicker()
+                    1 -> showSizePicker()
+                    2 -> showFactoryLauncher()
+                    3 -> showDiagnostics()
+                }
+            }
+            .show()
+    }
+
+    private fun showSizePicker() {
+        val sizes = UiScale.Size.entries
+        AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
+            .setTitle(R.string.settings_size)
+            .setSingleChoiceItems(
+                sizes.map { getString(it.title) }.toTypedArray(),
+                sizes.indexOf(UiScale.current(this)),
+            ) { dialog, which ->
+                dialog.dismiss()
+                if (sizes[which] != UiScale.current(this)) {
+                    UiScale.set(this, sizes[which])
+                    recreate()
+                }
+            }
+            .show()
+    }
+
+    /** Explica y abre los ajustes del launcher de fábrica para desactivarlo / reactivarlo. */
+    private fun showFactoryLauncher() {
+        val home = bridge.factoryHome()
+        if (home == null) {
+            Toast.makeText(this, R.string.factory_none, Toast.LENGTH_LONG).show()
+            return
+        }
+        val pkg = home.packageName
+        val label = try {
+            packageManager.getApplicationLabel(
+                packageManager.getApplicationInfo(pkg, android.content.pm.PackageManager.MATCH_DISABLED_COMPONENTS),
+            ).toString()
+        } catch (e: Exception) {
+            pkg
+        }
+        val enabled = bridge.isEnabled(pkg)
+        val builder = AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
+            .setTitle(R.string.factory_title)
+            .setMessage(getString(if (enabled) R.string.factory_body_enabled else R.string.factory_body_disabled, label))
+            .setPositiveButton(R.string.factory_open_settings) { _, _ -> openAppInfo(pkg) }
+            .setNegativeButton(R.string.close, null)
+        if (enabled) {
+            builder.setNeutralButton(R.string.factory_open) { _, _ ->
+                try {
+                    startActivity(Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME).setComponent(home)
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                } catch (_: Exception) {
+                }
+            }
+        }
+        builder.show()
+    }
+
+    private fun showDiagnostics() {
+        val text = TextView(this).apply {
+            this.text = Diagnostics.build(this@MainActivity, apps, bridge)
+            typeface = android.graphics.Typeface.MONOSPACE
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 9f)
+            setTextColor(getColor(R.color.text_primary))
+            setTextIsSelectable(true)
+            setPadding(dp(20), dp(8), dp(20), dp(8))
+        }
+        AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
+            .setTitle(R.string.diagnostics_title)
+            .setView(android.widget.ScrollView(this).apply { addView(text) })
+            .setPositiveButton(R.string.close, null)
+            .show()
     }
 
     // ================================================================ fondo
@@ -467,16 +570,20 @@ class MainActivity : Activity() {
         renderBt()
     }
 
+    /**
+     * En la T3L el Bluetooth del teléfono lo maneja un módulo aparte ("BC8-Android") que Android
+     * no ve: el estado del Bluetooth de Android NO sirve para decir "apagado" o "sin teléfono".
+     * Solo mostramos información positiva (sonando / conectado) y si no, la indicación.
+     */
     private fun renderBt() {
         val s = mediaState
-        val btPlaying = s?.title != null && s.packageName?.let { apps.isBluetoothPackage(it) } == true
+        val sessionTitle = s?.title?.takeIf { s.packageName?.let { apps.isBluetoothPackage(it) } == true }
+        val playingTitle = sessionTitle ?: factoryBtTitle
         val state = btState
         val (color, text) = when {
-            btPlaying -> R.color.accent_1 to getString(R.string.bt_playing, s!!.title)
+            playingTitle != null -> R.color.accent_1 to getString(R.string.bt_playing, playingTitle)
             state is BtStatus.State.Connected -> R.color.accent_1 to getString(R.string.bt_connected, state.name)
-            state == BtStatus.State.Off -> R.color.text_tertiary to getString(R.string.bt_off)
-            state == BtStatus.State.Disconnected -> R.color.text_tertiary to getString(R.string.bt_disconnected)
-            else -> R.color.accent_2 to getString(R.string.bt_hint)
+            else -> R.color.accent_2 to getString(R.string.bt_hint, getString(R.string.bt_radio_name))
         }
         btDot.backgroundTintList = ColorStateList.valueOf(getColor(color))
         btStatusText.text = text

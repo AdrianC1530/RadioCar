@@ -8,36 +8,46 @@ Datos tomados de *Ajustes → Estado de la Radio* (octubre 2026):
 | Procesador | TOPWAY T3L (Allwinner T3, 4× Cortex-A7 ~1.2 GHz) |
 | RAM | 1 GB |
 | Almacenamiento | 16 GB |
-| Android (según la radio) | 10 |
+| Android (según la radio) | 10 — probablemente 8.1 (API 27) real |
+| Pantalla | 1024×600, 160 dpi (por eso RadioCar agranda su interfaz) |
+| Nombre Bluetooth | **BC8-Android** (módulo BT propio, no la pila de Android) |
 | Vehículo | Ford F-150 2013 |
 
-## Ojo con el "Android 10"
+## Apps de fábrica (verificadas en otra T3L)
 
-En XDA hay reportes de T3L idénticas (1 GB / 16 GB) que dicen "Android 10" en ajustes pero por
-dentro son **Android 8.1 (API 27)**. El launcher está hecho para funcionar en ambos (minSdk 24).
+Fuente: inventario de paquetes del proyecto
+[t3l-android-headunit-revival](https://github.com/nurfaizfoat/t3l-android-headunit-revival)
+(misma placa, Android 8.1, 160 dpi).
 
-## Pendiente de confirmar en la radio
+| Función | Paquete / actividad |
+|---|---|
+| Launcher de fábrica ("Theme") | `com.dofun.variety/com.dofun.overseasvariety.Launcher` |
+| Bluetooth (teléfono y música BT) | `com.tw.bt/.ATBluetoothActivity` |
+| Radio FM | `com.tw.radio/.RadioActivity` |
+| Reproductor de video | `com.tw.video/.VideoActivity` |
+| Música local | `com.tw.music/.MusicActivity` |
+| Explorador de archivos | `com.tw.twfileexplore/.ui.view.activity.ExploreActivity` |
+| Ecualizador | `com.tw.eq/.EQActivity` |
+| Volante | `com.tw.keypad/.SteeringWheelActivity` |
+| Núcleo / servicios | `com.tw.core`, `com.tw.service` — **no tocar** |
 
-Con ADB conectado:
+## Detalles importantes
 
-```powershell
-$adb = "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe"
-& $adb shell getprop ro.build.version.sdk      # 27 = Android 8.1 real, 29 = Android 10
-& $adb shell wm size                           # resolución (¿1024x600?)
-& $adb shell wm density                        # densidad (¿160 o 240?)
-& $adb shell "pm list packages | grep -i -E 'tw|radio|bt|music'"   # apps de fábrica
-& $adb shell dumpsys meminfo com.radiocar.launcher | findstr TOTAL
-```
+- **"Theme" se impone**: tiene un servicio en primer plano y el botón Inicio lo abre. Para usar
+  otro launcher hay que desactivarlo (ver [03 · Instalación](03-instalacion.md#2--dejarlo-como-pantalla-de-inicio)).
+- **El Bluetooth del teléfono no pasa por Android**: lo maneja el módulo BC8 (proceso nativo
+  `gocsdk` en `/dev/ttyS3`) a través de `com.tw.bt`. Por eso Android no "ve" el teléfono conectado.
+- Las apps de fábrica hablan con el launcher por broadcasts **TXZNet**
+  (`com.txznet.launcher.<radio|bt|btmusic|call>.action.send/recv`). RadioCar solo **escucha**
+  los `recv` (para el diagnóstico y, si viene, el título de la canción BT); nunca envía comandos.
+
+## Pendiente de confirmar en ESTA radio
+
+Usa RadioCar → F-150 → **Diagnóstico** y saca una foto.
 
 | Dato | Valor |
 |---|---|
 | API real | _pendiente_ |
-| Resolución / densidad | _pendiente_ |
-| Paquete Radio FM | _pendiente_ (se prueba `com.tw.radio`) |
-| Paquete Bluetooth / Música BT | _pendiente_ (se prueba `com.tw.bt`, `com.tw.btmusic`) |
-| Paquete del reproductor de video | _pendiente_ (se prueba `com.tw.video`) |
-| Ruta de la memoria USB | _pendiente_ (`adb shell ls /storage`) |
+| ¿Mismos paquetes `com.tw.*` que la otra T3L? | _pendiente_ |
 | ¿El reproductor de fábrica abre videos desde RadioCar? | _pendiente_ |
-| ¿El BT usa la pila de Android o un chip aparte? | _pendiente_ |
-| ¿La app BT publica lo que suena (MediaSession)? | _pendiente_ |
-| RAM usada por RadioCar | _pendiente_ |
+| ¿La app BT anuncia la canción por TXZNet? | _pendiente_ |

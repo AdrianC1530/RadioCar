@@ -32,7 +32,26 @@
     <string name="bt_connected">Conectado · %1$s</string>
     <string name="bt_disconnected">Sin teléfono conectado</string>
     <string name="bt_off">Bluetooth apagado</string>
-    <string name="bt_hint">Conecta tu teléfono y dale play</string>
+    <string name="bt_hint">Conecta tu teléfono a «%1$s»</string>
+    <string name="bt_radio_name">BC8-Android</string>
+
+    <!-- Ajustes de RadioCar -->
+    <string name="settings_title">Ajustes de RadioCar</string>
+    <string name="settings_background">Fondo de pantalla</string>
+    <string name="settings_size">Tamaño de la pantalla</string>
+    <string name="settings_factory">Launcher de fábrica (Theme)</string>
+    <string name="settings_diagnostics">Diagnóstico (para soporte)</string>
+    <string name="size_large">Grande (recomendado)</string>
+    <string name="size_medium">Mediano</string>
+    <string name="size_system">Pequeño (original del sistema)</string>
+    <string name="factory_title">Launcher de fábrica</string>
+    <string name="factory_body_enabled">El launcher de fábrica «%1$s» sigue ACTIVO y por eso aparece al pulsar Inicio o al encender la radio.\n\nPara que RadioCar quede como inicio de verdad: toca «Abrir ajustes», luego «Desactivar» y acepta.\n\nSe puede volver a activar cuando quieras desde el mismo lugar (este menú → Launcher de fábrica → Abrir ajustes → Activar).</string>
+    <string name="factory_body_disabled">El launcher de fábrica «%1$s» está DESACTIVADO: RadioCar es el inicio.\n\nPara volver al original: «Abrir ajustes» → «Activar».</string>
+    <string name="factory_none">No se encontró otro launcher instalado.</string>
+    <string name="factory_open_settings">Abrir ajustes</string>
+    <string name="factory_open">Abrir el de fábrica</string>
+    <string name="close">Cerrar</string>
+    <string name="diagnostics_title">Diagnóstico — sácale una foto</string>
 
     <!-- Reproduciendo ahora -->
     <string name="media_label">REPRODUCIENDO</string>

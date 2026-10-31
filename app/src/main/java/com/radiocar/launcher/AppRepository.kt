@@ -57,7 +57,7 @@ class AppRepository(private val context: Context) {
         FILES(
             "files", R.string.slot_files, R.drawable.ic_folder,
             listOf(
-                "com.tw.filemanager", "com.tw.file", "com.android.documentsui",
+                "com.tw.twfileexplore", "com.tw.filemanager", "com.tw.file", "com.android.documentsui",
                 "com.google.android.documentsui", "com.mixplorer", "com.ghisler.android.TotalCommander",
             ),
             listOf("archivos", "explorador", "gestor", "file", "files"),

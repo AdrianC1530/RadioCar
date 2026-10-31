@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.4.0 — 2026-10-31
+
+Correcciones tras la primera prueba en la radio.
+
+- **Interfaz grande**: la T3L viene a 160 dpi y todo se veía diminuto. RadioCar ahora ajusta su
+  propia escala (≈1.5×). Opción *Tamaño de la pantalla*: Grande (por defecto), Mediano, Pequeño.
+- **Inicio de verdad**: nuevo menú *Ajustes de RadioCar* (insignia F-150) con
+  *Launcher de fábrica (Theme)*, que explica y abre la ficha para desactivarlo/reactivarlo.
+  En la T3L "Theme" se impone aunque elijas otra app de inicio.
+- **Bluetooth**: la radio usa un módulo BT propio ("BC8-Android") que Android no ve. La tarjeta ya
+  no dice "apagado/sin teléfono" por error; indica *Conecta tu teléfono a «BC8-Android»*.
+  Escucha los avisos TXZNet de la app BT de fábrica por si anuncia la canción.
+- Apps de fábrica de la T3L reconocidas: `com.tw.bt`, `com.tw.video`, `com.tw.radio`,
+  `com.tw.twfileexplore`.
+- **Diagnóstico** (para soporte): versión, pantalla, inicio por defecto, accesos y apps de fábrica.
+- Íconos de la barra lateral más grandes.
+
 ## 0.3.0 — 2026-10-31
 
 Ajustado al uso real: los videos se ven **desde una memoria USB en el reproductor de fábrica**.

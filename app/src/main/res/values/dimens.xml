@@ -4,7 +4,8 @@
     <dimen name="screen_pad">10dp</dimen>
     <dimen name="gap">10dp</dimen>
     <dimen name="rail_width">60dp</dimen>
-    <dimen name="rail_btn">46dp</dimen>
+    <dimen name="rail_btn">50dp</dimen>
+    <dimen name="rail_btn_pad">12dp</dimen>
     <dimen name="card_pad">12dp</dimen>
     <dimen name="card_radius">20dp</dimen>
 

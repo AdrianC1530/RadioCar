@@ -4,7 +4,7 @@ Launcher (pantalla de inicio) moderno y liviano para la radio Android china
 **Topway T3L** (pantalla horizontal 1024×600) de una **Ford F-150 2013**, pensado para lo que
 más se usa en el carro: **videos desde la memoria USB** y **música del teléfono por Bluetooth**.
 
-![Pantalla de inicio](docs/img/inicio-v0.3.png)
+![Pantalla de inicio](docs/img/inicio-v0.4.png)
 
 - **No toca firmware, ni root, ni el MCU/CAN.** Es una app normal; el launcher de fábrica
   sigue instalado y se puede volver a él en cualquier momento.
@@ -18,7 +18,7 @@ más se usa en el carro: **videos desde la memoria USB** y **música del teléfo
 | **Videos** | Detecta la memoria USB y cuántos videos tiene. Botones al **Reproductor** de fábrica y a **Archivos**, y accesos a los últimos videos: un toque y se reproducen |
 | **Bluetooth** | Estado del teléfono / lo que suena por BT, y botones a **Música BT** y **Teléfono** de la radio |
 | **Reproduciendo ahora** | Carátula, título, artista, progreso y controles de lo que esté sonando |
-| **Barra superior** | Hora, fecha, saludo, velocímetro GPS e insignia F-150 (tócala para cambiar el fondo) |
+| **Barra superior** | Hora, fecha, saludo, velocímetro GPS e insignia F-150 (tócala para los ajustes: fondo, tamaño, launcher de fábrica, diagnóstico) |
 | **Barra lateral** | Inicio, Navegación, Radio FM, Teléfono, todas las apps, Ajustes |
 | **Fondo** | Horizonte camaleón (por defecto), Aurora, Negro o **una foto tuya** |
 
@@ -29,8 +29,10 @@ más se usa en el carro: **videos desde la memoria USB** y **música del teléfo
 1. Descarga el APK desde [**Releases**](https://github.com/AdrianC1530/RadioCar/releases/latest)
    y cópialo a un pendrive.
 2. En la radio: administrador de archivos → toca el APK → instalar.
-3. Pulsa **Inicio** → elige **RadioCar** → **Siempre**.
-4. Acepta los permisos (ubicación y archivos).
+3. Ábrelo y acepta los permisos (ubicación y archivos).
+4. **Topway T3L:** toca la insignia **F-150** → **Launcher de fábrica (Theme)** → *Abrir ajustes* →
+   **Desactivar**. Sin esto, el botón Inicio sigue abriendo el launcher de fábrica.
+5. Pulsa **Inicio** → **RadioCar** → **Siempre**.
 
 Guía completa (permisos, ADB, cómo volver al de fábrica): [docs/03-instalacion.md](docs/03-instalacion.md).
 
